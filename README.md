@@ -71,6 +71,12 @@ make doc
 
 Or else, you could see the [online documentation](https://greengageplum.github.io/tries/) for the latest version.
 
+### Run the unit tests
+
+```sh
+make test
+```
+
 ### How to clean?
 
 To clean the project directory to start from zero there are multiple useful commands.

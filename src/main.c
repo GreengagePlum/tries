@@ -1,3 +1,14 @@
+/**
+ * @file main.c
+ * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
+ * @brief Fichier d'entrée dans le programme contenant la logique haut niveau des opérations
+ * @version 0.1
+ * @date 2024-11-18
+ *
+ * @copyright Copyright (C) 2024 Efe ERKEN
+ *
+ */
+
 #include "cJSON.h"
 #include "hybrid.h"
 #include "patricia.h"
