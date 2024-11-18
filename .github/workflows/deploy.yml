@@ -1,0 +1,61 @@
+name: deploy
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+jobs:
+  pages-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Dependencies
+        run: |
+          sudo apt -y update
+          sudo apt -y install graphviz doxygen
+      - run: make doc
+      - name: Fix permissions
+        run: |
+          chmod -c -R +rX "doc/public/" | while read line; do
+            echo "::warning title=Invalid file permissions automatically fixed::$line"
+          done
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: doc/public/
+          retention-days: 30
+  pages-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: pages-build
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+  release-job:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: pages-deploy
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: echo "Running release_job for ${{ github.ref_name }}"
+      - run: scripts/create_latest_release_description.sh > CHANGELOG.md
+      - uses: softprops/action-gh-release@v2.0.5
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body_path: "CHANGELOG.md"
+          fail_on_unmatched_files: true
