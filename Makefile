@@ -23,7 +23,7 @@ EXEC = tries
 
 ##### Options
 CPPFLAGS =
-CFLAGS = -Wall -Wextra -Werror -std=iso9899:2018 -pedantic -march=native -O3 -I$(HPATH) -I$(UPATH)
+CFLAGS = -Wall -Wextra -Werror -std=iso9899:2018 -pedantic -march=native -O3 -I$(HPATH) -I$(JPATH) -I$(UPATH)
 LDFLAGS =
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DPATH)$*.Td
 
