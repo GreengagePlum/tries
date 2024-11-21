@@ -3,7 +3,7 @@
 /**
  * @file hybrid.h
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
- * @brief Fichier d'entête contenant les déclaration des fonctions pour les Tries Hybrides
+ * @brief Fichier d'entête contenant les déclaration des fonctions pour le Trie Hybride
  * @version 0.1
  * @date 2024-11-18
  *

@@ -3,7 +3,7 @@
 /**
  * @file patricia.h
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
- * @brief Fichier d'entête contenant les déclaration des fonctions pour les Patricia-Tries
+ * @brief Fichier d'entête contenant les déclaration des fonctions pour le Patricia-Trie
  * @version 0.1
  * @date 2024-11-18
  *

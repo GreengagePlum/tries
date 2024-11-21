@@ -1,7 +1,7 @@
 /**
  * @file patricia.c
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
- * @brief Fichier source contenant les corps des fonctions pour les Patricia-Tries
+ * @brief Fichier source contenant les corps des fonctions pour le Patricia-Trie
  * @version 0.1
  * @date 2024-11-18
  *

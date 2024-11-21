@@ -1,7 +1,7 @@
 /**
  * @file hybrid.c
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
- * @brief Fichier source contenant les corps des fonctions pour les Tries Hybrides
+ * @brief Fichier source contenant les corps des fonctions pour le Trie Hybride
  * @version 0.1
  * @date 2024-11-18
  *
