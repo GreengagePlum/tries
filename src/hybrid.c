@@ -2,7 +2,7 @@
  * @file hybrid.c
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier source contenant les corps des fonctions pour le Trie Hybride
- * @version 0.1
+ * @version 0.2
  * @date 2024-11-18
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -18,15 +18,13 @@
 
 char prem(const char *cle)
 {
-    if (!cle)
-        return '\0';
+    assert(cle != NULL && "Cle donné n'existe pas");
     return *cle;
 }
 
 const char *reste(const char *cle)
 {
-    if (!cle)
-        return NULL;
+    assert(cle != NULL && "Cle donné n'existe pas");
     if (*cle == '\0')
         return NULL;
     return cle + 1;
@@ -40,6 +38,7 @@ char car(const char *cle, size_t i)
 
 size_t lgueur(const char *cle)
 {
+    assert(cle != NULL && "Clé donné n'existe pas");
     return strlen(cle);
 }
 
@@ -61,15 +60,19 @@ TrieHybride allocTH(void)
 
 TrieHybride ajoutTH(TrieHybride th, const char *restrict cle, int v)
 {
+    assert(v != 0 && "Valeur donné pour l'insértion doit être non nul");
+    char p = prem(cle);
+    if (!p)
+        return th;
+    assert(p != '\0' && "La clé ne peut pas être de taille 0 ici");
     if (!th)
     {
         TrieHybride newth = allocTH();
-        newth->label = prem(cle);
+        newth->label = p;
         newth->inf = NULL;
         newth->sup = NULL;
         if (lgueur(cle) == 1)
         {
-            assert(v != 0 && "Valeur donné pour l'insértion doit être non nul");
             newth->value = v;
             newth->eq = NULL;
         }
@@ -80,13 +83,16 @@ TrieHybride ajoutTH(TrieHybride th, const char *restrict cle, int v)
         }
         return newth;
     }
-    char p = prem(cle);
     if (p < th->label)
         th->inf = ajoutTH(th->inf, cle, v);
     else if (p > th->label)
         th->sup = ajoutTH(th->sup, cle, v);
     else
         th->eq = ajoutTH(th->eq, reste(cle), v);
+    if (lgueur(cle) == 1 && !th->value)
+    {
+        th->value = v;
+    }
     return th;
 }
 

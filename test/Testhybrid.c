@@ -1,5 +1,7 @@
 #include "hybrid.h"
 #include "unity.h"
+#include <stdlib.h>
+#include <string.h>
 
 const char *const basic_example =
     "A quel genial professeur de dactylographie sommes nous redevables de la superbe phrase ci "
@@ -16,7 +18,7 @@ void tearDown(void)
     // clean stuff up here
 }
 
-void test_create(void)
+void test_tiny(void)
 {
     TrieHybride th = newTH();
     int p = 1;
@@ -28,9 +30,29 @@ void test_create(void)
     deleteTH(&th);
 }
 
+void test_base(void)
+{
+    char *const basic_example_priv = malloc((strlen(basic_example) + 1) * sizeof(*basic_example_priv));
+    if (!basic_example_priv)
+        TEST_FAIL_MESSAGE("Erreur, malloc");
+    strcpy(basic_example_priv, basic_example);
+
+    TrieHybride th = newTH();
+    char *curr = strtok(basic_example_priv, " ");
+    while (curr)
+    {
+        th = ajoutTH(th, curr, VALFIN);
+        curr = strtok(NULL, " ");
+    }
+
+    deleteTH(&th);
+    free(basic_example_priv);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
-    RUN_TEST(test_create);
+    RUN_TEST(test_tiny);
+    RUN_TEST(test_base);
     return UNITY_END();
 }

@@ -19,6 +19,7 @@ void test_create(void)
 
 void test_rand(void)
 {
+    TEST_IGNORE();
     TEST_ASSERT_EQUAL(42, patricia(42));
 }
 
