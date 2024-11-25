@@ -22,10 +22,20 @@ BUILD_PATHS = $(BPATH) $(DPATH) $(OPATH) $(RPATH)
 EXEC = tries
 
 ##### Options
-CPPFLAGS = -DNDEBUG
-CFLAGS = -Wall -Wextra -Werror -std=iso9899:2018 -pedantic -march=native -O3 -I$(HPATH) -I$(JPATH) -I$(UPATH)
+CPPFLAGS =
+CFLAGS = -Wall -Wextra -Werror -std=iso9899:2018 -pedantic -I$(HPATH) -I$(JPATH) -I$(UPATH)
 LDFLAGS =
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DPATH)$*.Td
+
+# Use `make DEBUG=0` (or nothing) and `make DEBUG=1` to switch
+DEBUG ?= 0
+ifeq ($(DEBUG), 1)
+	CPPFLAGS += -DDEBUG
+	CFLAGS += -g
+else
+	CPPFLAGS += -DNDEBUG
+	CFLAGS += -march=native -O3
+endif
 
 ##### Files
 SRC = $(wildcard $(SPATH)*.c)
@@ -51,12 +61,12 @@ DOCPATH = doc/public/
 POSTCOMPILE = mv -f $(DPATH)$*.Td $(DPATH)$*.d && touch $@
 
 ##### Build rules
-.PHONY: all test doc clean cleandoc cleanall
-
-all: $(EXEC) test
+.PHONY: all test doc clean cleandoc cleanall FORCE
 
 $(EXEC): $(OBJ) $(OPATH)cJSON.o
 	$(CC) -o $@ $^ $(LDFLAGS)
+
+all: $(EXEC) test
 
 $(OPATH)%.o:: $(SPATH)%.c $(DPATH)%.d | $(OPATH) $(DPATH)
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -o $@ $<
@@ -80,8 +90,9 @@ test: $(BUILD_PATHS) $(RESULTS)
 	@echo "-----------------------\nPASSED:\n-----------------------"
 	@echo "$(PASSED)"
 	@echo "\nDONE"
+	@echo $(RESULTS) | tr ' ' '\n' | xargs -I % [ -s % ] || exit $$? && grep -qF 'FAIL' $(RESULTS); VAL=$$?; if [ $$VAL -gt 1 ]; then exit $$VAL; else exit $$(expr 1 - $$VAL); fi
 
-$(RPATH)%.txt: $(BPATH)%
+$(RPATH)%.txt: $(BPATH)% FORCE
 	-./$< > $@ 2>&1
 
 $(BPATH)Test%: $(OPATH)Test%.o $(OPATH)%.o $(OPATH)unity.o
@@ -98,6 +109,8 @@ $(RPATH):
 
 $(BPATH):
 	mkdir -p $@
+
+FORCE:
 
 $(DEP):
 

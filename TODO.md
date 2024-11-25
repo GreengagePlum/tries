@@ -24,4 +24,4 @@
 
 ## Done
 
-- [x]
+- [x] Find a way to build both debug and release targets in the Makefile
