@@ -32,6 +32,7 @@ const char *reste(const char *cle)
 
 char car(const char *cle, size_t i)
 {
+    assert(0 < i && "L'index donné ne doit pas déborder la clé");
     assert(lgueur(cle) >= i && "L'index donné ne doit pas déborder la clé");
     return *(cle + i - 1);
 }
@@ -61,17 +62,17 @@ TrieHybride allocTH(void)
 TrieHybride ajoutTH(TrieHybride th, const char *restrict cle, int v)
 {
     assert(v != 0 && "Valeur donné pour l'insértion doit être non nul");
-    char p = prem(cle);
-    if (!p)
+    size_t lgr = lgueur(cle);
+    if (lgr == 0)
         return th;
-    assert(p != '\0' && "La clé ne peut pas être de taille 0 ici");
+    char p = prem(cle);
     if (!th)
     {
         TrieHybride newth = allocTH();
         newth->label = p;
         newth->inf = NULL;
         newth->sup = NULL;
-        if (lgueur(cle) == 1)
+        if (lgr == 1)
         {
             newth->value = v;
             newth->eq = NULL;
@@ -89,13 +90,16 @@ TrieHybride ajoutTH(TrieHybride th, const char *restrict cle, int v)
         th->sup = ajoutTH(th->sup, cle, v);
     else
         th->eq = ajoutTH(th->eq, reste(cle), v);
-    if (lgueur(cle) == 1 && !th->value)
+    if (lgr == 1 && !th->value)
     {
         th->value = v;
     }
     return th;
 }
 
+/**
+ * @private
+ */
 typedef enum presence_enfants
 {
     INF = 1,     /**< Seulement l'enfant Inf est présent */
@@ -105,6 +109,8 @@ typedef enum presence_enfants
 } PresenceEnfants;
 
 /**
+ * @private
+ *
  * @brief Calcule une valeur qui indique lesquels des enfants du Trie Hybride sont présents
  *
  * @param [in] th Un pointeur vers le Trie Hybride à calculer les enfants
@@ -121,6 +127,8 @@ PresenceEnfants determine_enfants(TrieHybride th)
 }
 
 /**
+ * @private
+ *
  * @brief Supprime le noeud donné si possible et réorganise les sous arbres
  *
  * @param [in,out] th Un pointeur vers le noeud du Trie Hybride à essayer de supprimer
@@ -135,43 +143,42 @@ PresenceEnfants determine_enfants(TrieHybride th)
  */
 TrieHybride supprTH_essaye_delete_reorg(TrieHybride th, bool *didDelete)
 {
-    if (!th->eq)
+    if (th->eq || th->value)
     {
-        TrieHybride tmp;
-        switch (determine_enfants(th))
-        {
-        case INFSUP:
-            tmp = th->inf;
-            while (tmp->sup)
-                tmp = tmp->sup;
-            tmp->sup = th->sup;
-            tmp = th->inf;
-            break;
-        case INF:
-            tmp = th->inf;
-            break;
-        case SUP:
-            tmp = th->sup;
-            break;
-        case AUCUNENF:
-            tmp = NULL;
-            break;
-        default:
-            fprintf(stderr, "Erreur, calcul présence des enfants malheureux");
-            exit(1);
-        }
-        free(th);
-        th = tmp;
-        *didDelete = true;
+        return th;
     }
-    else
+    TrieHybride tmp;
+    switch (determine_enfants(th))
     {
-        th->value = VALVIDE;
+    case INFSUP:
+        tmp = th->inf;
+        while (tmp->sup)
+            tmp = tmp->sup;
+        tmp->sup = th->sup;
+        tmp = th->inf;
+        break;
+    case INF:
+        tmp = th->inf;
+        break;
+    case SUP:
+        tmp = th->sup;
+        break;
+    case AUCUNENF:
+        tmp = NULL;
+        break;
+    default:
+        fprintf(stderr, "Erreur, calcul présence des enfants malheureux");
+        exit(1);
     }
+    free(th);
+    th = tmp;
+    *didDelete = true;
     return th;
 }
 
 /**
+ * @private
+ *
  * @brief Supprime la clé donné avec libération des noeuds si possible et réorganise les sous arbres
  *
  * @param [in,out] th Un pointeur vers le Trie Hybride à traiter
@@ -205,6 +212,7 @@ TrieHybride supprTH_rec(TrieHybride th, const char *restrict cle, bool *didDelet
     {
         if (th->value)
         {
+            th->value = VALVIDE;
             th = supprTH_essaye_delete_reorg(th, didDelete);
         }
     }

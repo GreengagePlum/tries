@@ -32,7 +32,7 @@
 typedef struct trie_hybride
 {
     char label; /**< Un caractère d'une clé stocké dans le trie */
-    int value;  /**< Indicateur de fin de mot stocké si non nul */
+    int value;  /**< Indicateur de fin de mot si non nul */
     struct trie_hybride *inf, *eq, *sup;
 } *TrieHybride;
 
@@ -128,7 +128,8 @@ TrieHybride supprTH(TrieHybride th, const char *restrict cle);
  *
  * @param [in,out] th Un pointeur de pointeur vers le Trie Hybride à libérer. Mis à nul à la fin.
  *
- * Libère en utilisant un parcours en postfix.
+ * Libère en utilisant un parcours en postfix. Le trie donné en paramètre peut être nul ou vide ou déjà désalloué, ces
+ * cas sont gérés.
  *
  */
 void deleteTH(TrieHybride *th);
