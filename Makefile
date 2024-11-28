@@ -51,6 +51,8 @@ PASSED = `grep -s PASS $(RPATH)*.txt`
 FAIL = `grep -s FAIL $(RPATH)*.txt`
 IGNORE = `grep -s IGNORE $(RPATH)*.txt`
 
+EXIT_STAT_TMP_FILE = $(RPATH)test_exit_stat.tmp
+
 ##### Documentation generation
 DOCGEN = doxygen
 DOXYFILE = doc/Doxyfile
@@ -90,10 +92,10 @@ test: $(BUILD_PATHS) $(RESULTS)
 	@echo "-----------------------\nPASSED:\n-----------------------"
 	@echo "$(PASSED)"
 	@echo "\nDONE"
-	@echo $(RESULTS) | tr ' ' '\n' | xargs -I % [ -s % ] || exit $$? && grep -qF 'FAIL' $(RESULTS); VAL=$$?; if [ $$VAL -gt 1 ]; then exit $$VAL; else exit $$(expr 1 - $$VAL); fi
+	@[ -s $(EXIT_STAT_TMP_FILE) ] && VAL=$$(cat $(EXIT_STAT_TMP_FILE)) || VAL=0; rm -f $(EXIT_STAT_TMP_FILE); exit $$VAL
 
 $(RPATH)%.txt: $(BPATH)% FORCE
-	-./$< > $@ 2>&1
+	-./$< > $@ 2>&1 || echo $$? > $(EXIT_STAT_TMP_FILE)
 
 $(BPATH)Test%: $(OPATH)Test%.o $(OPATH)%.o $(OPATH)unity.o
 	$(CC) -o $@ $^ $(LDFLAGS)
@@ -117,7 +119,7 @@ $(DEP):
 -include $(DEP)
 
 clean:
-	rm -f $(EXEC) $(OBJ) $(DEP) $(RESULTS)
+	rm -f $(EXEC) $(OBJ) $(DEP) $(RESULTS) $(EXIT_STAT_TMP_FILE)
 
 cleandoc:
 	rm -rf $(DOCPATH)
