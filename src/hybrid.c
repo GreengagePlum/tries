@@ -90,7 +90,7 @@ TrieHybride ajoutTH(TrieHybride th, const char *restrict cle, int v)
         th->sup = ajoutTH(th->sup, cle, v);
     else
         th->eq = ajoutTH(th->eq, reste(cle), v);
-    if (lgr == 1 && !th->value)
+    if (lgr == 1 && th->label == p && !th->value)
     {
         th->value = v;
     }

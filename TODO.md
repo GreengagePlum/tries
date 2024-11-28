@@ -11,10 +11,11 @@
   - [ ] Optimize code and remove unnecessary instructions
   - [ ] Refactor code for better readability and structure
   - [ ] Make sure code is coherent with the values used (NULL, '\0', VALVIDE, newTH(), etc.)
+  - [ ] `restrict` pointer arguments on `TrieHybride` parameters
 
 ## Configuration
 
-- [ ] Find a way to build both debug and release targets in the Makefile
+- [ ]
 
 ## Miscellaneous
 
