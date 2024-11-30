@@ -10,18 +10,17 @@
  * @copyright Copyright (C) 2024 Efe ERKEN
  *
  */
+#define ASCII_SIZE 128
+#define EOE_INDEX 0
+#define EOE_CHAR '\x01'
 
-/**
- * @brief Fonction qui fait quelque chose
- *
- * @param [in] p Un nombre quelconque
- * @return Un nombre magique
- *
- * @pre -
- * @post -
- *
- * Cette fonction fait quelque chose qui est expliqué plus en détails ici.
- */
-int patricia(int p);
+typedef struct PatriciaNode{
+    char *prefixes[ASCII_SIZE];
+    struct PatriciaNode *children[ASCII_SIZE];
+} PatriciaNode;
+
+PatriciaNode *create_patricia_node();
+void insert_patricia(PatriciaNode *root, const char *mot);
+int plus_long_pref(const char *s1, const char *s2);
 
 #endif
