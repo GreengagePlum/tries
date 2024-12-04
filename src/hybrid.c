@@ -12,9 +12,12 @@
 #include "hybrid.h"
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define MAX3(a, b, c) ((a) > (b) ? ((a) > (c) ? (a) : (c)) : ((b) > (c) ? (b) : (c)))
 
 char prem(const char *cle)
 {
@@ -246,4 +249,217 @@ void deleteTH(TrieHybride *th)
     if (!th)
         return;
     *th = deleteTH_rec(*th);
+}
+
+bool rechercheTH(TrieHybride th, const char *restrict cle)
+{
+    if (!th)
+        return false;
+    size_t lgr = lgueur(cle);
+    if (lgr == 0)
+        return false;
+    bool res;
+    char p = prem(cle);
+    if (p < th->label)
+        res = rechercheTH(th->inf, cle);
+    else if (p > th->label)
+        res = rechercheTH(th->sup, cle);
+    else
+        res = rechercheTH(th->eq, reste(cle));
+    if (lgr == 1)
+        return res || (th->label == p && th->value);
+    return res;
+}
+
+size_t comptageMotsTH(TrieHybride th)
+{
+    if (!th)
+        return 0;
+    if (th->value)
+        return 1 + comptageMotsTH(th->inf) + comptageMotsTH(th->eq) + comptageMotsTH(th->sup);
+    return comptageMotsTH(th->inf) + comptageMotsTH(th->eq) + comptageMotsTH(th->sup);
+}
+
+typedef struct stack
+{
+    size_t cap;
+    size_t sz;
+    char *tab;
+} Stack;
+
+Stack newStack(size_t capacity)
+{
+    assert(capacity > 0 && "Capacité donné doit être strictement positive");
+    Stack s;
+    s.cap = capacity;
+    s.sz = 0;
+    s.tab = malloc(capacity * sizeof(*s.tab));
+    if (!s.tab)
+    {
+        fprintf(stderr, "Erreur, malloc dans listeMots");
+        exit(1);
+    }
+    return s;
+}
+
+void freeStack(Stack s)
+{
+    free(s.tab);
+}
+
+void pushStack(Stack *s, char c)
+{
+    assert(s->sz + 1 <= s->cap && "Capacité de la pile de caractères dépassé");
+    s->tab[s->sz++] = c;
+}
+
+char popStack(Stack *s)
+{
+    assert(s->sz > 0 && "Tentative de dépilement sur une pile de caractères vide");
+    return s->tab[--s->sz];
+}
+
+char *snapshotStack(Stack *s)
+{
+    if (!s)
+        return NULL;
+    if (s->sz == 0)
+        return NULL;
+    char *ret = malloc((s->sz + 1) * sizeof(*ret));
+    if (!ret)
+    {
+        fprintf(stderr, "Erreur, malloc dans snapshotStack");
+        exit(1);
+    }
+    memcpy(ret, s->tab, s->sz);
+    ret[s->sz] = '\0';
+    return ret;
+}
+
+void listeMotsTH_rec(TrieHybride th, Stack *s, char **tab, size_t *idx)
+{
+    if (!th)
+        return;
+    listeMotsTH_rec(th->inf, s, tab, idx);
+    pushStack(s, th->label);
+    listeMotsTH_rec(th->eq, s, tab, idx);
+    popStack(s);
+    listeMotsTH_rec(th->sup, s, tab, idx);
+    if (th->value)
+    {
+        pushStack(s, th->label);
+        tab[*idx] = snapshotStack(s);
+        (*idx)++;
+        popStack(s);
+    }
+}
+
+char **listeMotsTH(TrieHybride th)
+{
+    if (!th)
+        return NULL;
+    size_t sz = comptageMotsTH(th);
+    char **tab = malloc((sz + 1) * sizeof(*tab));
+    if (!tab)
+    {
+        fprintf(stderr, "Erreur, malloc dans listeMots");
+        exit(1);
+    }
+    tab[sz] = NULL;
+    Stack s = newStack(hauteurTH(th));
+    sz = 0;
+    listeMotsTH_rec(th, &s, tab, &sz);
+    assert(s.sz == 0 && "La pile des caractères doit être vide à cet instant");
+    freeStack(s);
+    return tab;
+}
+
+void deleteListeMotsTH(char **tab)
+{
+    if (!tab)
+        return;
+    for (char **i = tab; *i; i++)
+    {
+        free(*i);
+    }
+    free(tab);
+}
+
+int comptageNilTH(TrieHybride th)
+{
+    if (!th)
+        return 1;
+    return comptageNilTH(th->inf) + comptageNilTH(th->eq) + comptageNilTH(th->sup);
+}
+
+size_t hauteurTH(TrieHybride th)
+{
+    if (!th || (!th->eq && determine_enfants(th) == AUCUNENF))
+        return 0;
+    return 1 + MAX3(hauteurTH(th->inf), hauteurTH(th->eq), hauteurTH(th->sup));
+}
+
+void profondeurMoyenneTH_rec(TrieHybride th, int depth, int *sum, int *count)
+{
+    if (!th)
+        return;
+    if (!th->eq && determine_enfants(th) == AUCUNENF)
+    {
+        (*sum) += depth;
+        (*count)++;
+        return;
+    }
+    profondeurMoyenneTH_rec(th->inf, depth + 1, sum, count);
+    profondeurMoyenneTH_rec(th->eq, depth + 1, sum, count);
+    profondeurMoyenneTH_rec(th->sup, depth + 1, sum, count);
+}
+
+int profondeurMoyenneTH(TrieHybride th)
+{
+    int sum = 0, count = 0;
+    profondeurMoyenneTH_rec(th, 0, &sum, &count);
+    if (count == 0)
+        return -1;
+    assert(count > 0 && "Le compte des feuilles doit être strictement positif");
+    assert(sum >= 0 && "La somme des profondeurs doit être positif ou nul");
+    return sum / count;
+}
+
+int prefixeTH_rec(TrieHybride th)
+{
+    if (!th)
+        return 0;
+    return !!th->value + prefixeTH_rec(th->inf) + prefixeTH_rec(th->eq) + prefixeTH_rec(th->sup);
+}
+
+int prefixeTH(TrieHybride th, const char *cle)
+{
+    if (!th)
+        return 0;
+
+    TrieHybride lastNode = NULL;
+    TrieHybride subtree = th;
+    const char *r = cle;
+    char p;
+    /* Advance until the subtree that interests us */
+    while (subtree)
+    {
+        p = prem(r);
+        if (p == '\0')
+            break;
+
+        lastNode = subtree;
+        if (p < subtree->label)
+            subtree = subtree->inf;
+        else if (p > subtree->label)
+            subtree = subtree->sup;
+        else
+        {
+            subtree = subtree->eq;
+            r = reste(r);
+        }
+    }
+
+    /* Yeah not too proud of this one */
+    return (!(*r) && lastNode && lastNode->value) + prefixeTH_rec(subtree);
 }

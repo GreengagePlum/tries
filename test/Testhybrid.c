@@ -1970,6 +1970,661 @@ void test_huge_suppr(void)
     deleteTH(&th);
 }
 
+/* Black box test
+ *
+ * case #1:
+ * search key in an empty trie
+ */
+void test_f_rechercheTH_1(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+    TEST_ASSERT_FALSE(rechercheTH(th, "LeBron"));
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #2:
+ * search only key in a trie
+ */
+void test_f_rechercheTH_2(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+    th = ajoutTH(th, "LeBron", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+    TEST_ASSERT_TRUE(rechercheTH(th, "LeBron"));
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #3:
+ * search one of the two keys that share a prefix
+ */
+void test_f_rechercheTH_3(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+    th = ajoutTH(th, "help", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+    TEST_ASSERT_TRUE(rechercheTH(th, "helm"));
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #4:
+ * search one of the two keys that share a prefix
+ */
+void test_f_rechercheTH_4(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+    th = ajoutTH(th, "help", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+    TEST_ASSERT_TRUE(rechercheTH(th, "help"));
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #5:
+ * search the whole works of Shakespeare
+ */
+void test_f_rechercheTH_shakes(void)
+{
+    const char *const dir_path = "test/Shakespeare/";
+    const size_t dir_size = strlen(dir_path);
+
+    DIR *dir;
+    if ((dir = opendir(dir_path)) == NULL)
+        TEST_FAIL_MESSAGE("Erreur, opendir");
+
+    TrieHybride th = newTH();
+
+    struct dirent *dirent;
+    errno = 0;
+    char path_buf[PATH_MAX];
+    while ((dirent = readdir(dir)) != NULL)
+    {
+        if (strstr(dirent->d_name, ".txt") == NULL)
+            continue;
+
+        snprintf(path_buf, PATH_MAX, "%.*s%s", (int)dir_size, dir_path, dirent->d_name);
+
+        struct stat stat_buf;
+        if (stat(path_buf, &stat_buf) == -1)
+            TEST_FAIL_MESSAGE("Erreur, stat");
+
+        int fd;
+        if ((fd = open(path_buf, O_RDONLY)) == -1)
+            TEST_FAIL_MESSAGE("Erreur, open");
+
+        char *buf = malloc((stat_buf.st_size + 1) * sizeof(*buf));
+        buf[stat_buf.st_size] = '\0';
+        if (buf == NULL)
+            TEST_FAIL_MESSAGE("Erreur, malloc");
+
+        if (read(fd, buf, stat_buf.st_size) < stat_buf.st_size)
+            TEST_FAIL_MESSAGE("Erreur, read");
+
+        char *curr = strtok(buf, "\n");
+        while (curr)
+        {
+            th = ajoutTH(th, curr, VALFIN);
+            curr = strtok(NULL, "\n");
+        }
+
+        if (close(fd) == -1)
+            TEST_FAIL_MESSAGE("Erreur, close");
+        free(buf);
+    }
+    if (errno)
+        TEST_FAIL_MESSAGE("Erreur, readdir");
+
+    rewinddir(dir);
+    while ((dirent = readdir(dir)) != NULL)
+    {
+        if (strstr(dirent->d_name, ".txt") == NULL)
+            continue;
+
+        snprintf(path_buf, PATH_MAX, "%s%s", dir_path, dirent->d_name);
+
+        struct stat stat_buf;
+        if (stat(path_buf, &stat_buf) == -1)
+            TEST_FAIL_MESSAGE("Erreur, stat");
+
+        int fd;
+        if ((fd = open(path_buf, O_RDONLY)) == -1)
+            TEST_FAIL_MESSAGE("Erreur, open");
+
+        char *buf = malloc((stat_buf.st_size + 1) * sizeof(*buf));
+        buf[stat_buf.st_size] = '\0';
+        if (buf == NULL)
+            TEST_FAIL_MESSAGE("Erreur, malloc");
+
+        if (read(fd, buf, stat_buf.st_size) < stat_buf.st_size)
+            TEST_FAIL_MESSAGE("Erreur, read");
+
+        char *curr = strtok(buf, "\n");
+        while (curr)
+        {
+            TEST_ASSERT_TRUE(rechercheTH(th, curr));
+            curr = strtok(NULL, "\n");
+        }
+
+        if (close(fd) == -1)
+            TEST_FAIL_MESSAGE("Erreur, close");
+        free(buf);
+    }
+    if (errno)
+        TEST_FAIL_MESSAGE("Erreur, readdir");
+
+    if (closedir(dir) == -1)
+        TEST_FAIL_MESSAGE("Erreur, closedir");
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #1:
+ * count the keys of an empty trie
+ */
+void test_f_comptageMotsTH_1(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+    TEST_ASSERT_EQUAL(0, comptageMotsTH(th));
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #2:
+ * count the keys of a complex trie
+ */
+void test_f_comptageMotsTH_2(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helt", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    th = ajoutTH(th, "zoomin", VALFIN);
+    TEST_ASSERT_EQUAL(5, comptageMotsTH(th));
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #3:
+ * count the unique words in the whole works of Shakespeare
+ */
+void test_f_comptageMotsTH_shakes(void)
+{
+    const char *const dir_path = "test/Shakespeare/";
+    const size_t dir_size = strlen(dir_path);
+
+    DIR *dir;
+    if ((dir = opendir(dir_path)) == NULL)
+        TEST_FAIL_MESSAGE("Erreur, opendir");
+
+    TrieHybride th = newTH();
+
+    struct dirent *dirent;
+    errno = 0;
+    char path_buf[PATH_MAX];
+    while ((dirent = readdir(dir)) != NULL)
+    {
+        if (strstr(dirent->d_name, ".txt") == NULL)
+            continue;
+
+        snprintf(path_buf, PATH_MAX, "%.*s%s", (int)dir_size, dir_path, dirent->d_name);
+
+        struct stat stat_buf;
+        if (stat(path_buf, &stat_buf) == -1)
+            TEST_FAIL_MESSAGE("Erreur, stat");
+
+        int fd;
+        if ((fd = open(path_buf, O_RDONLY)) == -1)
+            TEST_FAIL_MESSAGE("Erreur, open");
+
+        char *buf = malloc((stat_buf.st_size + 1) * sizeof(*buf));
+        buf[stat_buf.st_size] = '\0';
+        if (buf == NULL)
+            TEST_FAIL_MESSAGE("Erreur, malloc");
+
+        if (read(fd, buf, stat_buf.st_size) < stat_buf.st_size)
+            TEST_FAIL_MESSAGE("Erreur, read");
+
+        char *curr = strtok(buf, "\n");
+        while (curr)
+        {
+            th = ajoutTH(th, curr, VALFIN);
+            curr = strtok(NULL, "\n");
+        }
+
+        if (close(fd) == -1)
+            TEST_FAIL_MESSAGE("Erreur, close");
+        free(buf);
+    }
+    if (errno)
+        TEST_FAIL_MESSAGE("Erreur, readdir");
+
+    // cat test/Shakespeare/*.txt | sort | uniq | wc -w
+    TEST_ASSERT_EQUAL(23086, comptageMotsTH(th));
+
+    if (closedir(dir) == -1)
+        TEST_FAIL_MESSAGE("Erreur, closedir");
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #1:
+ * calculate height of an empty tree
+ */
+void test_f_hauteurTH_1(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+    TEST_ASSERT_EQUAL(0, hauteurTH(th));
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #2:
+ * calculate height of a tree containing a single key
+ */
+void test_f_hauteurTH_2(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+    th = ajoutTH(th, "hello", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+    TEST_ASSERT_EQUAL(4, hauteurTH(th));
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #3:
+ * calculate height of a complex tree containing multiple keys
+ */
+void test_f_hauteurTH_3(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    th = ajoutTH(th, "ada", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+    TEST_ASSERT_EQUAL(5, hauteurTH(th));
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #1:
+ * alphabetically list the keys of an emtpy trie
+ */
+void test_f_listeMotsTH_1(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+    char **res = listeMotsTH(th);
+    TEST_ASSERT_NULL(res);
+    deleteListeMotsTH(res);
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #2:
+ * alphabetically list the keys of a complex trie
+ */
+void test_f_listeMotsTH_2(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    th = ajoutTH(th, "ada", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    char **res = listeMotsTH(th);
+    TEST_ASSERT_NOT_NULL(res);
+    TEST_ASSERT_NOT_NULL(res[0]);
+    TEST_ASSERT_NOT_NULL(res[1]);
+    TEST_ASSERT_NOT_NULL(res[2]);
+    TEST_ASSERT_NOT_NULL(res[3]);
+    TEST_ASSERT_NULL(res[4]);
+
+    TEST_ASSERT_EQUAL_STRING("ada", res[0]);
+    TEST_ASSERT_EQUAL_STRING("hello", res[1]);
+    TEST_ASSERT_EQUAL_STRING("helm", res[2]);
+    TEST_ASSERT_EQUAL_STRING("help", res[3]);
+
+    deleteListeMotsTH(res);
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #1:
+ * count null pointers on an empty trie
+ */
+void test_f_comptageNilTH_1(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    TEST_ASSERT_EQUAL(1, comptageNilTH(th));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #2:
+ * count null pointers on a complex trie
+ */
+void test_f_comptageNilTH_2(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(15, comptageNilTH(th));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #1:
+ * calculate the average depth of an empty trie
+ */
+void test_f_profondeurMoyenneTH_1(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    TEST_ASSERT_EQUAL(-1, profondeurMoyenneTH(th));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #2:
+ * calculate the average depth of a complex trie
+ */
+void test_f_profondeurMoyenneTH_2(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(4, profondeurMoyenneTH(th));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #1:
+ * count how many words' prefix is a given word in an empty trie
+ */
+void test_f_prefixeTH_1(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    TEST_ASSERT_EQUAL(0, prefixeTH(th, "LeBron"));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #2:
+ * count how many words' prefix is a given word in a complex trie,
+ * the given word is not in the trie,
+ * the given word is completely unrelated to any words in the trie
+ */
+void test_f_prefixeTH_2(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(0, prefixeTH(th, "pro"));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #3:
+ * count how many words' prefix is a given word in a complex trie,
+ * the given word is not in the trie,
+ * the given word is partially related to the first word in the trie,
+ * the given word is shorter than the first word in the trie
+ */
+void test_f_prefixeTH_3(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(0, prefixeTH(th, "her"));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #4:
+ * count how many words' prefix is a given word in a complex trie,
+ * the given word is not in the trie,
+ * the given word is partially related to the first word in the trie,
+ * the given word is longer than the first word in the trie
+ */
+void test_f_prefixeTH_4(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(0, prefixeTH(th, "helloh"));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #5:
+ * count how many words' prefix is a given word in a complex trie,
+ * the given word is not in the trie,
+ * the given word is partially related to the first word in the trie,
+ * the given word is the same length as the first word in the trie
+ */
+void test_f_prefixeTH_5(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(0, prefixeTH(th, "hella"));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #6:
+ * count how many words' prefix is a given word in a complex trie,
+ * the given word is in the trie
+ */
+void test_f_prefixeTH_6(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(1, prefixeTH(th, "hello"));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #7:
+ * count how many words' prefix is a given word in a complex trie,
+ * the given word is in the trie
+ */
+void test_f_prefixeTH_7(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(1, prefixeTH(th, "hell"));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #8:
+ * count how many words' prefix is a given word in a complex trie,
+ * the given word is in the trie
+ */
+void test_f_prefixeTH_8(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(3, prefixeTH(th, "hel"));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #9:
+ * count how many words' prefix is a given word in a complex trie,
+ * the given word is in the trie
+ */
+void test_f_prefixeTH_9(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(1, prefixeTH(th, "help"));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #10:
+ * count how many words' prefix is a given word in a complex trie,
+ * the given word is in the trie
+ */
+void test_f_prefixeTH_10(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(1, prefixeTH(th, "helm"));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #11:
+ * count how many words' prefix is a given word in a complex trie,
+ * the given word is in the trie
+ */
+void test_f_prefixeTH_11(void)
+{
+    TrieHybride th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    th = ajoutTH(th, "hel", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(4, prefixeTH(th, "hel"));
+
+    deleteTH(&th);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -2016,5 +2671,33 @@ int main(void)
     RUN_TEST(test_shakespeare_suppr);
     RUN_TEST(test_huge);
     RUN_TEST(test_huge_suppr);
+    RUN_TEST(test_f_rechercheTH_1);
+    RUN_TEST(test_f_rechercheTH_2);
+    RUN_TEST(test_f_rechercheTH_3);
+    RUN_TEST(test_f_rechercheTH_4);
+    RUN_TEST(test_f_rechercheTH_shakes);
+    RUN_TEST(test_f_comptageMotsTH_1);
+    RUN_TEST(test_f_comptageMotsTH_2);
+    RUN_TEST(test_f_comptageMotsTH_shakes);
+    RUN_TEST(test_f_hauteurTH_1);
+    RUN_TEST(test_f_hauteurTH_2);
+    RUN_TEST(test_f_hauteurTH_3);
+    RUN_TEST(test_f_listeMotsTH_1);
+    RUN_TEST(test_f_listeMotsTH_2);
+    RUN_TEST(test_f_comptageNilTH_1);
+    RUN_TEST(test_f_comptageNilTH_2);
+    RUN_TEST(test_f_profondeurMoyenneTH_1);
+    RUN_TEST(test_f_profondeurMoyenneTH_2);
+    RUN_TEST(test_f_prefixeTH_1);
+    RUN_TEST(test_f_prefixeTH_2);
+    RUN_TEST(test_f_prefixeTH_3);
+    RUN_TEST(test_f_prefixeTH_4);
+    RUN_TEST(test_f_prefixeTH_5);
+    RUN_TEST(test_f_prefixeTH_6);
+    RUN_TEST(test_f_prefixeTH_7);
+    RUN_TEST(test_f_prefixeTH_8);
+    RUN_TEST(test_f_prefixeTH_9);
+    RUN_TEST(test_f_prefixeTH_10);
+    RUN_TEST(test_f_prefixeTH_11);
     return UNITY_END();
 }

@@ -11,6 +11,7 @@
  *
  */
 
+#include <stdbool.h>
 #include <stddef.h>
 
 /**
@@ -133,5 +134,89 @@ TrieHybride supprTH(TrieHybride th, const char *restrict cle);
  *
  */
 void deleteTH(TrieHybride *th);
+
+/**
+ * @brief Recherche une clé dans le Trie Hybride donné
+ *
+ * @param [in] th Un pointeur vers le Trie Hybride recherché
+ * @param [in] cle Une chaine de caractères constituant une clé
+ * @return Un booléen indiquant si la clé a été trouvé dans le trie ou pas
+ *
+ * @pre La clé est terminé par un caractère nul
+ * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
+ *
+ */
+bool rechercheTH(TrieHybride th, const char *restrict cle);
+
+/**
+ * @brief Compte le nombre de mots dans le Trie Hybride donné
+ *
+ * @param [in] th Un pointeur vers le Trie Hybride à parcourir
+ * @return Un entier non signé indiquant le nombre de clés/mots trouvés
+ *
+ */
+size_t comptageMotsTH(TrieHybride th);
+
+/**
+ * @brief Liste les mots du trie dans l'ordre alphabétique
+ *
+ * @param [in] th Un pointeur vers le Trie Hybride à parcourir
+ * @return Un tableau, de dernier élément nul, de chaines de caractères avec tous les mots du trie en ordre alphabétique
+ *
+ * @post Le tableau retourné doit être libéré avec la fonction `deleteListeMots()`
+ *
+ */
+char **listeMotsTH(TrieHybride th);
+
+/**
+ * @brief Libère la liste des mots créé par `listeMots()`
+ *
+ * @param [in] tab Le tableau des chaines de caractères créé par `listeMots()`
+ *
+ */
+void deleteListeMotsTH(char **tab);
+
+/**
+ * @brief Compte les pointeurs vers nul
+ *
+ * @param [in] th Un pointeur vers le Trie Hybride à parcourir
+ * @return Un entier non négatif indiquant le nombre de pointeurs vers nul
+ *
+ */
+int comptageNilTH(TrieHybride th);
+
+/**
+ * @brief Calcule la hauteur du Trie Hybride donné
+ *
+ * @param [in] th Un pointeur vers le Trie Hybride à parcourir
+ * @return Un entier non négatif indiquant la hauteur de l'arbre engandré par le trie
+ *
+ */
+size_t hauteurTH(TrieHybride th);
+
+/**
+ * @brief Calcule la profondeur moyenne du Trie Hybride donné
+ *
+ * @param [in] th Un pointeur vers le Trie Hybride à parcourir
+ * @return Un entier indiquant la profondeur moyenne de l'arbre engandré par le trie
+ *
+ * Le retour est -1 quand le trie donné est vide. L'entier retourné est obtenu en ne gardant seulement la partie entière
+ * de la division réel sans arrondir.
+ *
+ */
+int profondeurMoyenneTH(TrieHybride th);
+
+/**
+ * @brief Compte le nombre de mots dont la clé donné est le prefixe dans le trie donné
+ *
+ * @param [in] th Un pointeur vers le Trie Hybride à parcourir
+ * @param [in] cle Une chaine de caractères constituant une clé
+ * @return Un entier indiquant le nombre de mots dont cle est le prefixe dans le trie
+ *
+ * @pre La clé est terminé par un caractère nul
+ * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
+ *
+ */
+int prefixeTH(TrieHybride th, const char *cle);
 
 #endif
