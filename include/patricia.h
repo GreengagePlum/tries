@@ -38,5 +38,6 @@ int max(int a, int b);
 char** liste_mots_patricia(PatriciaNode* node);
 void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char** res, int* index);
 void print_list_patricia(char** liste, int size);
-
+void calcule_profondeur_moyenne_patricia_feuille(PatriciaNode* node, int profondeur, int* sum, int* nbFeuilles);
+int profondeur_moyenne_patricia_feuille(PatriciaNode* node);
 #endif

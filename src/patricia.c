@@ -363,3 +363,34 @@ void print_list_patricia(char** list, int size) {
     printf("%s ]\n", list[size-1]);
 
 }
+
+int profondeur_moyenne_patricia_feuille(PatriciaNode* node){
+    int sum = 0;
+    int nbFeuilles = 0;
+
+    calcule_profondeur_moyenne_patricia_feuille(node, 0, &sum, &nbFeuilles);
+    if(nbFeuilles == 0){
+        return 0;
+    }
+    else {
+        return sum / nbFeuilles;
+    }
+}
+
+void calcule_profondeur_moyenne_patricia_feuille(PatriciaNode* node, int profondeur, int* sum, int* nbFeuilles){
+    if(estvide(node)){
+        return;
+    }
+
+    for(int i = 0; i < ASCII_SIZE; i++){
+        if(node->prefixes[i] != NULL){
+            if(has_eoe_char(node->prefixes[i])){
+                *sum += profondeur + 1;
+                (*nbFeuilles)++;
+            }
+            else{
+                calcule_profondeur_moyenne_patricia_feuille(node->children[i], profondeur + 1, sum, nbFeuilles);
+            }
+        }
+    }
+}

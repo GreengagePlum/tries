@@ -30,6 +30,7 @@ void test_insert(void)
     TEST_ASSERT_EQUAL(2, comptage_mots_patricia(node));
     char** liste = liste_mots_patricia(node);
     print_list_patricia(liste, 2);
+    printf("Profondeur moyenne: %d\n", profondeur_moyenne_patricia_feuille(node));
     free(node);
 }
 
