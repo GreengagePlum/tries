@@ -61,4 +61,72 @@ void suppressionPT(const char *path);
  */
 void suppressionTH(const char *path);
 
+/**
+ * @brief Lit le Patricia-Trie depuis le fichier JSON donné en argument, liste les mots qu'il contient sur la sortie
+ * standard
+ *
+ * @param [in] path Une chaine de caractères (nul terminé) constituant le chemin vers un fichier JSON d'un Patricia-Trie
+ *
+ * La liste de mots écrit sur la sortie standard est sous forme d'un mot par ligne.
+ *
+ */
+void listeMotsMainPT(const char *path);
+
+/**
+ * @brief Lit le Trie Hybride depuis le fichier JSON donné en argument, liste les mots qu'il contient sur la sortie
+ * standard
+ *
+ * @param [in] path Une chaine de caractères (nul terminé) constituant le chemin vers un fichier JSON d'un Trie Hybride
+ *
+ * La liste de mots écrit sur la sortie standard est sous forme d'un mot par ligne.
+ *
+ */
+void listeMotsMainTH(const char *path);
+
+/**
+ * @brief Lit le Patricia-Trie depuis le fichier JSON donné en argument, écrit sa profondeur moyenne sur la sortie
+ * standard
+ *
+ * @param [in] path Une chaine de caractères (nul terminé) constituant le chemin vers un fichier JSON d'un Patricia-Trie
+ *
+ * La profondeur moyenne écrit est un flottant et ne contient pas de retour à la ligne.
+ *
+ */
+void profondeurMoyenneMainPT(const char *path);
+
+/**
+ * @brief Lit le Trie Hybride depuis le fichier JSON donné en argument, écrit sa profondeur moyenne sur la sortie
+ * standard
+ *
+ * @param [in] path Une chaine de caractères (nul terminé) constituant le chemin vers un fichier JSON d'un Trie Hybride
+ *
+ * La profondeur moyenne écrit est un flottant et ne contient pas de retour à la ligne.
+ *
+ */
+void profondeurMoyenneMainTH(const char *path);
+
+/**
+ * @brief Lit le Patricia-Trie depuis le fichier JSON donné en argument ainsi qu'un mot, écrit le nombre de mots pour
+ * lequel le mot donné est le prefixe sur la sortie standard
+ *
+ * @param [in] path Une chaine de caractères (nul terminé) constituant le chemin vers un fichier JSON d'un Patricia-Trie
+ * @param [in] cle Une chaine de caractères (nul terminé) constituant une clé/mot, caractères ASCII (128 possibilités)
+ *
+ * Le nombre de préfixe écrit est un entier et ne contient pas de retour à la ligne.
+ *
+ */
+void prefixeMainPT(const char *path, const char *cle);
+
+/**
+ * @brief Lit le Trie Hybride depuis le fichier JSON donné en argument ainsi qu'un mot, écrit le nombre de mots pour
+ * lequel le mot donné est le prefixe sur la sortie standard
+ *
+ * @param [in] path Une chaine de caractères (nul terminé) constituant le chemin vers un fichier JSON d'un Trie Hybride
+ * @param [in] cle Une chaine de caractères (nul terminé) constituant une clé/mot, caractères ASCII (128 possibilités)
+ *
+ * Le nombre de préfixe écrit est un entier et ne contient pas de retour à la ligne.
+ *
+ */
+void prefixeMainTH(const char *path, const char *cle);
+
 #endif

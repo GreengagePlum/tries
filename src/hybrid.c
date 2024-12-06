@@ -18,6 +18,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * @private
+ *
+ * @def MAX3
+ *
+ * @brief Trouve le moximum entre 3 valeurs
+ *
+ * ATTENTION à ne pas faire des appels à des fonction en paramètre de ce macro à risque qu'il appelle PLUSIEURS fois vos
+ * fonctions ! Passez seulement des valeurs (variables).
+ *
+ */
 #define MAX3(a, b, c) ((a) > (b) ? ((a) > (c) ? (a) : (c)) : ((b) > (c) ? (b) : (c)))
 
 char prem(const char *cle)
@@ -343,16 +354,14 @@ void listeMotsTH_rec(const TrieHybride *th, Stack *s, char **tab, size_t *idx)
         return;
     listeMotsTH_rec(th->inf, s, tab, idx);
     pushStack(s, th->label);
+    if (th->value)
+    {
+        tab[*idx] = snapshotStack(s);
+        (*idx)++;
+    }
     listeMotsTH_rec(th->eq, s, tab, idx);
     popStack(s);
     listeMotsTH_rec(th->sup, s, tab, idx);
-    if (th->value)
-    {
-        pushStack(s, th->label);
-        tab[*idx] = snapshotStack(s);
-        (*idx)++;
-        popStack(s);
-    }
 }
 
 char **listeMotsTH(const TrieHybride *th)
@@ -367,7 +376,7 @@ char **listeMotsTH(const TrieHybride *th)
         exit(1);
     }
     tab[sz] = NULL;
-    Stack s = newStack(hauteurTH(th));
+    Stack s = newStack(hauteurTH(th) + 1);
     sz = 0;
     listeMotsTH_rec(th, &s, tab, &sz);
     assert(s.sz == 0 && "La pile des caractères doit être vide à cet instant");
@@ -397,7 +406,10 @@ size_t hauteurTH(const TrieHybride *th)
 {
     if (!th || (!th->eq && determine_enfants(th) == AUCUNENF))
         return 0;
-    return 1 + MAX3(hauteurTH(th->inf), hauteurTH(th->eq), hauteurTH(th->sup));
+    size_t inf = hauteurTH(th->inf);
+    size_t eq = hauteurTH(th->eq);
+    size_t sup = hauteurTH(th->sup);
+    return 1 + MAX3(inf, eq, sup);
 }
 
 void profondeurMoyenneTH_rec(const TrieHybride *th, int depth, int *sum, int *count)
@@ -415,7 +427,7 @@ void profondeurMoyenneTH_rec(const TrieHybride *th, int depth, int *sum, int *co
     profondeurMoyenneTH_rec(th->sup, depth + 1, sum, count);
 }
 
-int profondeurMoyenneTH(const TrieHybride *th)
+int profondeurMoyenneEntTH(const TrieHybride *th)
 {
     int sum = 0, count = 0;
     profondeurMoyenneTH_rec(th, 0, &sum, &count);
@@ -424,6 +436,17 @@ int profondeurMoyenneTH(const TrieHybride *th)
     assert(count > 0 && "Le compte des feuilles doit être strictement positif");
     assert(sum >= 0 && "La somme des profondeurs doit être positif ou nul");
     return sum / count;
+}
+
+double profondeurMoyenneTH(const TrieHybride *th)
+{
+    int sum = 0, count = 0;
+    profondeurMoyenneTH_rec(th, 0, &sum, &count);
+    if (count == 0)
+        return -1;
+    assert(count > 0 && "Le compte des feuilles doit être strictement positif");
+    assert(sum >= 0 && "La somme des profondeurs doit être positif ou nul");
+    return (double)sum / count;
 }
 
 int prefixeTH_rec(const TrieHybride *th)

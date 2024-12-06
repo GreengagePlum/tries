@@ -22,4 +22,4 @@ if ! [ "$x" -eq 0 -o "$x" -eq 1 ]; then
 fi
 
 # Run the program
-./tries 5 "$x" "$z" <"$y" >"$outfile"
+./tries 5 "$x" "$y" "$z" >"$outfile"

@@ -164,7 +164,8 @@ size_t comptageMotsTH(const TrieHybride *th);
  * @brief Liste les mots du trie dans l'ordre alphabétique
  *
  * @param [in] th Un pointeur vers le Trie Hybride à parcourir
- * @return Un tableau, de dernier élément nul, de chaines de caractères avec tous les mots du trie en ordre alphabétique
+ * @return Un tableau, de dernier élément nul, de chaines de caractères avec tous les mots du trie en ordre
+ * alphabétique, pointeur nul est retourné au lieu d'un tableau dans le cas le trie donné est vide
  *
  * @post Le tableau retourné doit être libéré avec la fonction `deleteListeMots()`
  *
@@ -207,7 +208,18 @@ size_t hauteurTH(const TrieHybride *th);
  * de la division réel sans arrondir.
  *
  */
-int profondeurMoyenneTH(const TrieHybride *th);
+int profondeurMoyenneEntTH(const TrieHybride *th);
+
+/**
+ * @brief Calcule la profondeur moyenne du Trie Hybride donné
+ *
+ * @param [in] th Un pointeur vers le Trie Hybride à parcourir
+ * @return Un flottant indiquant la profondeur moyenne de l'arbre engandré par le trie
+ *
+ * Le retour est négatif quand le trie donné est vide.
+ *
+ */
+double profondeurMoyenneTH(const TrieHybride *th);
 
 /**
  * @brief Compte le nombre de mots dont la clé donné est le prefixe dans le trie donné

@@ -76,10 +76,52 @@ int main(int argc, char *argv[])
     case FUSION:
         break;
     case LISTEMOTS:
+        if (argc != 4)
+        {
+            fprintf(stderr, "usage: %s %d <TrieType> <arbre.json>", argv[0], LISTEMOTS);
+            exit(1);
+        }
+        if (tt == PATRICIA)
+            listeMotsMainPT(argv[3]);
+        else if (tt == HYBRID)
+            listeMotsMainTH(argv[3]);
+        else
+        {
+            fprintf(stderr, "Erreur, TrieType [%d] inconnu", tt);
+            exit(1);
+        }
         break;
     case PROFONDEURMOYENNE:
+        if (argc != 4)
+        {
+            fprintf(stderr, "usage: %s %d <TrieType> <arbre.json>", argv[0], PROFONDEURMOYENNE);
+            exit(1);
+        }
+        if (tt == PATRICIA)
+            profondeurMoyenneMainPT(argv[3]);
+        else if (tt == HYBRID)
+            profondeurMoyenneMainTH(argv[3]);
+        else
+        {
+            fprintf(stderr, "Erreur, TrieType [%d] inconnu", tt);
+            exit(1);
+        }
         break;
     case PREFIXE:
+        if (argc != 5)
+        {
+            fprintf(stderr, "usage: %s %d <TrieType> <arbre.json> <word>", argv[0], PREFIXE);
+            exit(1);
+        }
+        if (tt == PATRICIA)
+            prefixeMainPT(argv[3], argv[4]);
+        else if (tt == HYBRID)
+            prefixeMainTH(argv[3], argv[4]);
+        else
+        {
+            fprintf(stderr, "Erreur, TrieType [%d] inconnu", tt);
+            exit(1);
+        }
         break;
     default:
         fprintf(stderr, "Erreur, OpType [%d] inconnu", op);

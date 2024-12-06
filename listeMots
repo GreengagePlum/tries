@@ -20,4 +20,4 @@ if ! [ "$x" -eq 0 -o "$x" -eq 1 ]; then
 fi
 
 # Run the program
-./tries 3 "$x" <"$y" >"$outfile"
+./tries 3 "$x" "$y" >"$outfile"

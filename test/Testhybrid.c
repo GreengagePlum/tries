@@ -2324,6 +2324,42 @@ void test_f_listeMotsTH_2(void)
 
 /* Black box test
  *
+ * case #3:
+ * alphabetically list the keys of a complex trie
+ */
+void test_f_listeMotsTH_3(void)
+{
+    TrieHybride *th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "car", VALFIN);
+    th = ajoutTH(th, "cat", VALFIN);
+    th = ajoutTH(th, "cart", VALFIN);
+    th = ajoutTH(th, "dog", VALFIN);
+    th = ajoutTH(th, "bat", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    char **res = listeMotsTH(th);
+    TEST_ASSERT_NOT_NULL(res);
+    TEST_ASSERT_NOT_NULL(res[0]);
+    TEST_ASSERT_NOT_NULL(res[1]);
+    TEST_ASSERT_NOT_NULL(res[2]);
+    TEST_ASSERT_NOT_NULL(res[3]);
+    TEST_ASSERT_NOT_NULL(res[4]);
+    TEST_ASSERT_NULL(res[5]);
+
+    TEST_ASSERT_EQUAL_STRING("bat", res[0]);
+    TEST_ASSERT_EQUAL_STRING("car", res[1]);
+    TEST_ASSERT_EQUAL_STRING("cart", res[2]);
+    TEST_ASSERT_EQUAL_STRING("cat", res[3]);
+    TEST_ASSERT_EQUAL_STRING("dog", res[4]);
+
+    deleteListeMotsTH(res);
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
  * case #1:
  * count null pointers on an empty trie
  */
@@ -2362,12 +2398,47 @@ void test_f_comptageNilTH_2(void)
  * case #1:
  * calculate the average depth of an empty trie
  */
+void test_f_profondeurMoyenneEntTH_1(void)
+{
+    TrieHybride *th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    TEST_ASSERT_EQUAL(-1, profondeurMoyenneEntTH(th));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #2:
+ * calculate the average depth of a complex trie
+ */
+void test_f_profondeurMoyenneEntTH_2(void)
+{
+    TrieHybride *th = newTH();
+    TEST_ASSERT_NULL(th);
+
+    th = ajoutTH(th, "hello", VALFIN);
+    th = ajoutTH(th, "help", VALFIN);
+    th = ajoutTH(th, "helm", VALFIN);
+    TEST_ASSERT_NOT_NULL(th);
+
+    TEST_ASSERT_EQUAL(4, profondeurMoyenneEntTH(th));
+
+    deleteTH(&th);
+}
+
+/* Black box test
+ *
+ * case #1:
+ * calculate the average depth of an empty trie
+ */
 void test_f_profondeurMoyenneTH_1(void)
 {
     TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
-    TEST_ASSERT_EQUAL(-1, profondeurMoyenneTH(th));
+    TEST_ASSERT(profondeurMoyenneTH(th) < 0);
 
     deleteTH(&th);
 }
@@ -2387,7 +2458,7 @@ void test_f_profondeurMoyenneTH_2(void)
     th = ajoutTH(th, "helm", VALFIN);
     TEST_ASSERT_NOT_NULL(th);
 
-    TEST_ASSERT_EQUAL(4, profondeurMoyenneTH(th));
+    TEST_ASSERT_EQUAL(4.5, profondeurMoyenneTH(th));
 
     deleteTH(&th);
 }
@@ -2684,8 +2755,11 @@ int main(void)
     RUN_TEST(test_f_hauteurTH_3);
     RUN_TEST(test_f_listeMotsTH_1);
     RUN_TEST(test_f_listeMotsTH_2);
+    RUN_TEST(test_f_listeMotsTH_3);
     RUN_TEST(test_f_comptageNilTH_1);
     RUN_TEST(test_f_comptageNilTH_2);
+    RUN_TEST(test_f_profondeurMoyenneEntTH_1);
+    RUN_TEST(test_f_profondeurMoyenneEntTH_2);
     RUN_TEST(test_f_profondeurMoyenneTH_1);
     RUN_TEST(test_f_profondeurMoyenneTH_2);
     RUN_TEST(test_f_prefixeTH_1);
