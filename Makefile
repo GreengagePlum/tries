@@ -97,7 +97,7 @@ test: $(BUILD_PATHS) $(RESULTS)
 $(RPATH)%.txt: $(BPATH)% FORCE
 	-./$< > $@ 2>&1 || echo $$? > $(EXIT_STAT_TMP_FILE)
 
-$(BPATH)Test%: $(OPATH)Test%.o $(OPATH)%.o $(OPATH)unity.o
+$(BPATH)Test%: $(OPATH)Test%.o $(OPATH)%.o $(OPATH)unity.o $(OPATH)cJSON.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 $(OPATH):

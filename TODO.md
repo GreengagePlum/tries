@@ -19,10 +19,10 @@
 
 ## Miscellaneous
 
-- [ ] Hybrid Trie
-  - [ ] Write a print function to visualize the structure on the console
 - [ ] Package/compile as a shared library
 
 ## Done
 
+- [x] Hybrid Trie
+  - [x] Write a print function to visualize the structure on the console
 - [x] Find a way to build both debug and release targets in the Makefile

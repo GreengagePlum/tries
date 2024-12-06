@@ -2,7 +2,7 @@
  * @file hybrid.c
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier source contenant les corps des fonctions pour le Trie Hybride
- * @version 0.2
+ * @version 0.3
  * @date 2024-11-18
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -10,6 +10,7 @@
  */
 
 #include "hybrid.h"
+#include "cJSON.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -56,7 +57,7 @@ TrieHybride allocTH(void)
     TrieHybride newth = malloc(sizeof(*newth));
     if (!newth)
     {
-        fprintf(stderr, "Erreur, malloc dans ajoutTH");
+        fprintf(stderr, "Erreur, malloc dans allocTH");
         exit(1);
     }
     return newth;
@@ -462,4 +463,113 @@ int prefixeTH(TrieHybride th, const char *cle)
 
     /* Yeah not too proud of this one */
     return (!(*r) && lastNode && lastNode->value) + prefixeTH_rec(subtree);
+}
+
+cJSON *constructJSONTH(TrieHybride th)
+{
+    if (!th)
+    {
+        cJSON *null = cJSON_CreateNull();
+        if (!null)
+        {
+            fprintf(stderr, "Erreur, cJSON_CreateNull dans constructJSONTH");
+            exit(1);
+        }
+        return null;
+    }
+    cJSON *obj = cJSON_CreateObject();
+    if (!obj)
+    {
+        fprintf(stderr, "Erreur, cJSON_CreateObject dans constructJSONTH");
+        exit(1);
+    }
+    char buf[2] = {th->label, 0};
+    if (!cJSON_AddStringToObject(obj, "char", buf))
+    {
+        fprintf(stderr, "Erreur, cJSON_AddStringToObject dans constructJSONTH");
+        exit(1);
+    }
+    if (!cJSON_AddBoolToObject(obj, "is_end_of_word", th->value))
+    {
+        fprintf(stderr, "Erreur, cJSON_AddBoolToObject dans constructJSONTH");
+        exit(1);
+    }
+
+    cJSON *child;
+    child = constructJSONTH(th->inf);
+    if (!cJSON_AddItemToObject(obj, "left", child))
+    {
+        fprintf(stderr, "Erreur, cJSON_AddItemToObject dans constructJSONTH");
+        exit(1);
+    }
+    child = constructJSONTH(th->eq);
+    if (!cJSON_AddItemToObject(obj, "middle", child))
+    {
+        fprintf(stderr, "Erreur, cJSON_AddItemToObject dans constructJSONTH");
+        exit(1);
+    }
+    child = constructJSONTH(th->sup);
+    if (!cJSON_AddItemToObject(obj, "right", child))
+    {
+        fprintf(stderr, "Erreur, cJSON_AddItemToObject dans constructJSONTH");
+        exit(1);
+    }
+
+    return obj;
+}
+
+char *printJSONTH(TrieHybride th)
+{
+    cJSON *js = constructJSONTH(th);
+    char *str = cJSON_Print(js);
+    cJSON_Delete(js);
+    return str;
+}
+
+TrieHybride parseJSONTH_rec(const cJSON *json)
+{
+    if (cJSON_IsNull(json))
+        return NULL;
+
+    TrieHybride th = allocTH();
+    cJSON *obj;
+
+    obj = cJSON_GetObjectItemCaseSensitive(json, "char");
+    assert(cJSON_IsString(obj) && "'char' element has to be a JSON string element");
+    th->label = obj->valuestring[0];
+    obj = cJSON_GetObjectItemCaseSensitive(json, "is_end_of_word");
+    assert(cJSON_IsBool(obj) && "'is_end_of_word' element has to be a JSON bool element");
+    th->value = cJSON_IsTrue(obj);
+
+    obj = cJSON_GetObjectItemCaseSensitive(json, "left");
+    assert((cJSON_IsNull(obj) || cJSON_IsObject(obj)) && "'left' element has to be a JSON null or object element");
+    th->inf = parseJSONTH_rec(obj);
+
+    obj = cJSON_GetObjectItemCaseSensitive(json, "middle");
+    assert((cJSON_IsNull(obj) || cJSON_IsObject(obj)) && "'middle' element has to be a JSON null or object element");
+    th->eq = parseJSONTH_rec(obj);
+
+    obj = cJSON_GetObjectItemCaseSensitive(json, "right");
+    assert((cJSON_IsNull(obj) || cJSON_IsObject(obj)) && "'right' element has to be a JSON null or object element");
+    th->sup = parseJSONTH_rec(obj);
+
+    return th;
+}
+
+TrieHybride parseJSONTH(const char *json, size_t sz)
+{
+    cJSON *obj = cJSON_ParseWithLength(json, sz);
+    if (!obj)
+    {
+        fprintf(stderr, "Erreur, cJSON_ParseWithLength dans parseJSONTH");
+        const char *error_ptr = cJSON_GetErrorPtr();
+        if (error_ptr)
+        {
+            fprintf(stderr, "Error before: %s\n", error_ptr);
+        }
+        exit(1);
+    }
+    TrieHybride th = parseJSONTH_rec(obj);
+    cJSON_Delete(obj);
+    return th;
 }

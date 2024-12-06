@@ -4,7 +4,7 @@
  * @file hybrid.h
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier d'entête contenant les déclaration des fonctions pour le Trie Hybride
- * @version 0.2
+ * @version 0.3
  * @date 2024-11-18
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -218,5 +218,33 @@ int profondeurMoyenneTH(TrieHybride th);
  *
  */
 int prefixeTH(TrieHybride th, const char *cle);
+
+/**
+ * @brief Sérialise le Trie Hybride donné sous format JSON
+ *
+ * @param [in] th Un pointeur vers le Trie Hybride à parcourir
+ * @return Une chaine de caractères contenant la version sérialisé en JSON du Trie Hybride
+ *
+ * @post C'est à l'appellant de désallouer la chaine retourné
+ *
+ */
+char *printJSONTH(TrieHybride th);
+
+/**
+ * @brief Désérialise le JSON en Trie Hybride
+ *
+ * @param [in] json Une chaine de caractères contenant un Trie Hybride sous format JSON
+ * @param [in] sz La taille en octets de la chaine json
+ * @return Un pointeur vers le Trie Hybride créé
+ *
+ * @post C'est à l'appellant de désallouer le Trie Hybride retourné
+ *
+ * C'est une désérialisation dit "one-to-one", c'est à dire la représentation interne en mémoire du trie donné sous
+ * forme de JSON ne passe en aucun cas par d'autres primitives de Trie Hybride. Cela est fait dans le but d'éviter la
+ * création d'un arbre différent dû à la reconstruction. Le Trie Hybride créé correspond exactement à la disposition
+ * donné en JSON.
+ *
+ */
+TrieHybride parseJSONTH(const char *json, size_t sz);
 
 #endif
