@@ -4,7 +4,7 @@
  * @file hybrid.h
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier d'entête contenant les déclaration des fonctions pour le Trie Hybride
- * @version 0.3
+ * @version 0.4
  * @date 2024-11-18
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -35,7 +35,7 @@ typedef struct trie_hybride
     char label; /**< Un caractère d'une clé stocké dans le trie */
     int value;  /**< Indicateur de fin de mot si non nul */
     struct trie_hybride *inf, *eq, *sup;
-} *TrieHybride;
+} TrieHybride;
 
 /**
  * @brief Renvoie le premier caractère de la clé
@@ -95,21 +95,22 @@ size_t lgueur(const char *cle);
  * @return Un pointeur sur le Trie Hybride créé
  *
  */
-TrieHybride newTH(void);
+TrieHybride *newTH(void);
 
 /**
  * @brief Ajoute une clé dans le Trie Hybride donné
  *
  * @param [in,out] th Un pointeur vers le Trie Hybride à insérer la clé
  * @param [in] cle Une chaine de caractères constituant une clé
- * @param [in] v Une valeur non nul pour indiquer la fin du mot, peut être le numéro d'insértion
+ * @param [in] v Une valeur non nul pour indiquer la fin du mot, peut être le numéro d'insértion, le constant @c VALFIN
+ * peut être utilisé
  * @return Un pointeur vers le Trie Hybride avec la clé ajouté
  *
  * @pre La clé est terminé par un caractère nul
  * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
  *
  */
-TrieHybride ajoutTH(TrieHybride th, const char *restrict cle, int v);
+TrieHybride *ajoutTH(TrieHybride *th, const char *restrict cle, int v);
 
 /**
  * @brief Supprime une clé du Trie Hybride donné
@@ -121,8 +122,10 @@ TrieHybride ajoutTH(TrieHybride th, const char *restrict cle, int v);
  * @pre La clé est terminé par un caractère nul
  * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
  *
+ * @internal Le constant @c VALVIDE peut être utilisé pour tester si un noeud n'est pas terminal
+ *
  */
-TrieHybride supprTH(TrieHybride th, const char *restrict cle);
+TrieHybride *supprTH(TrieHybride *th, const char *restrict cle);
 
 /**
  * @brief Libère l'espace occupé par le Trie Hybride donné
@@ -133,7 +136,7 @@ TrieHybride supprTH(TrieHybride th, const char *restrict cle);
  * cas sont gérés.
  *
  */
-void deleteTH(TrieHybride *th);
+void deleteTH(TrieHybride **th);
 
 /**
  * @brief Recherche une clé dans le Trie Hybride donné
@@ -146,7 +149,7 @@ void deleteTH(TrieHybride *th);
  * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
  *
  */
-bool rechercheTH(TrieHybride th, const char *restrict cle);
+bool rechercheTH(const TrieHybride *th, const char *restrict cle);
 
 /**
  * @brief Compte le nombre de mots dans le Trie Hybride donné
@@ -155,7 +158,7 @@ bool rechercheTH(TrieHybride th, const char *restrict cle);
  * @return Un entier non signé indiquant le nombre de clés/mots trouvés
  *
  */
-size_t comptageMotsTH(TrieHybride th);
+size_t comptageMotsTH(const TrieHybride *th);
 
 /**
  * @brief Liste les mots du trie dans l'ordre alphabétique
@@ -166,7 +169,7 @@ size_t comptageMotsTH(TrieHybride th);
  * @post Le tableau retourné doit être libéré avec la fonction `deleteListeMots()`
  *
  */
-char **listeMotsTH(TrieHybride th);
+char **listeMotsTH(const TrieHybride *th);
 
 /**
  * @brief Libère la liste des mots créé par `listeMots()`
@@ -183,7 +186,7 @@ void deleteListeMotsTH(char **tab);
  * @return Un entier non négatif indiquant le nombre de pointeurs vers nul
  *
  */
-int comptageNilTH(TrieHybride th);
+int comptageNilTH(const TrieHybride *th);
 
 /**
  * @brief Calcule la hauteur du Trie Hybride donné
@@ -192,7 +195,7 @@ int comptageNilTH(TrieHybride th);
  * @return Un entier non négatif indiquant la hauteur de l'arbre engandré par le trie
  *
  */
-size_t hauteurTH(TrieHybride th);
+size_t hauteurTH(const TrieHybride *th);
 
 /**
  * @brief Calcule la profondeur moyenne du Trie Hybride donné
@@ -204,7 +207,7 @@ size_t hauteurTH(TrieHybride th);
  * de la division réel sans arrondir.
  *
  */
-int profondeurMoyenneTH(TrieHybride th);
+int profondeurMoyenneTH(const TrieHybride *th);
 
 /**
  * @brief Compte le nombre de mots dont la clé donné est le prefixe dans le trie donné
@@ -217,7 +220,7 @@ int profondeurMoyenneTH(TrieHybride th);
  * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
  *
  */
-int prefixeTH(TrieHybride th, const char *cle);
+int prefixeTH(const TrieHybride *th, const char *cle);
 
 /**
  * @brief Sérialise le Trie Hybride donné sous format JSON
@@ -228,7 +231,7 @@ int prefixeTH(TrieHybride th, const char *cle);
  * @post C'est à l'appellant de désallouer la chaine retourné
  *
  */
-char *printJSONTH(TrieHybride th);
+char *printJSONTH(const TrieHybride *th);
 
 /**
  * @brief Désérialise le JSON en Trie Hybride
@@ -245,6 +248,6 @@ char *printJSONTH(TrieHybride th);
  * donné en JSON.
  *
  */
-TrieHybride parseJSONTH(const char *json, size_t sz);
+TrieHybride *parseJSONTH(const char *json, size_t sz);
 
 #endif

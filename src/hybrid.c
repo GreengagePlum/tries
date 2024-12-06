@@ -2,7 +2,7 @@
  * @file hybrid.c
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier source contenant les corps des fonctions pour le Trie Hybride
- * @version 0.3
+ * @version 0.4
  * @date 2024-11-18
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -47,14 +47,14 @@ size_t lgueur(const char *cle)
     return strlen(cle);
 }
 
-TrieHybride newTH(void)
+TrieHybride *newTH(void)
 {
     return NULL;
 }
 
-TrieHybride allocTH(void)
+TrieHybride *allocTH(void)
 {
-    TrieHybride newth = malloc(sizeof(*newth));
+    TrieHybride *newth = malloc(sizeof(*newth));
     if (!newth)
     {
         fprintf(stderr, "Erreur, malloc dans allocTH");
@@ -63,7 +63,7 @@ TrieHybride allocTH(void)
     return newth;
 }
 
-TrieHybride ajoutTH(TrieHybride th, const char *restrict cle, int v)
+TrieHybride *ajoutTH(TrieHybride *th, const char *restrict cle, int v)
 {
     assert(v != 0 && "Valeur donné pour l'insértion doit être non nul");
     size_t lgr = lgueur(cle);
@@ -72,7 +72,7 @@ TrieHybride ajoutTH(TrieHybride th, const char *restrict cle, int v)
     char p = prem(cle);
     if (!th)
     {
-        TrieHybride newth = allocTH();
+        TrieHybride *newth = allocTH();
         newth->label = p;
         newth->inf = NULL;
         newth->sup = NULL;
@@ -125,7 +125,7 @@ typedef enum presence_enfants
  * L'enfant Eq n'est pas tenu en compte, il faut vérifier cela à part.
  *
  */
-PresenceEnfants determine_enfants(TrieHybride th)
+PresenceEnfants determine_enfants(const TrieHybride *th)
 {
     return (!!th->sup << 1) | (!!th->inf);
 }
@@ -145,13 +145,13 @@ PresenceEnfants determine_enfants(TrieHybride th)
  * Il y a plusieurs cas de traitement.
  *
  */
-TrieHybride supprTH_essaye_delete_reorg(TrieHybride th, bool *didDelete)
+TrieHybride *supprTH_essaye_delete_reorg(TrieHybride *th, bool *didDelete)
 {
     if (th->eq || th->value)
     {
         return th;
     }
-    TrieHybride tmp;
+    TrieHybride *tmp;
     switch (determine_enfants(th))
     {
     case INFSUP:
@@ -193,7 +193,7 @@ TrieHybride supprTH_essaye_delete_reorg(TrieHybride th, bool *didDelete)
  * @pre didDelete a été alloué par l'appelant
  *
  */
-TrieHybride supprTH_rec(TrieHybride th, const char *restrict cle, bool *didDelete)
+TrieHybride *supprTH_rec(TrieHybride *th, const char *restrict cle, bool *didDelete)
 {
     if (!th)
         return th;
@@ -228,13 +228,13 @@ TrieHybride supprTH_rec(TrieHybride th, const char *restrict cle, bool *didDelet
     return th;
 }
 
-TrieHybride supprTH(TrieHybride th, const char *restrict cle)
+TrieHybride *supprTH(TrieHybride *th, const char *restrict cle)
 {
     bool didDelete = false;
     return supprTH_rec(th, cle, &didDelete);
 }
 
-TrieHybride deleteTH_rec(TrieHybride th)
+TrieHybride *deleteTH_rec(TrieHybride *th)
 {
     if (!th)
         return NULL;
@@ -245,14 +245,14 @@ TrieHybride deleteTH_rec(TrieHybride th)
     return NULL;
 }
 
-void deleteTH(TrieHybride *th)
+void deleteTH(TrieHybride **th)
 {
     if (!th)
         return;
     *th = deleteTH_rec(*th);
 }
 
-bool rechercheTH(TrieHybride th, const char *restrict cle)
+bool rechercheTH(const TrieHybride *th, const char *restrict cle)
 {
     if (!th)
         return false;
@@ -272,7 +272,7 @@ bool rechercheTH(TrieHybride th, const char *restrict cle)
     return res;
 }
 
-size_t comptageMotsTH(TrieHybride th)
+size_t comptageMotsTH(const TrieHybride *th)
 {
     if (!th)
         return 0;
@@ -337,7 +337,7 @@ char *snapshotStack(Stack *s)
     return ret;
 }
 
-void listeMotsTH_rec(TrieHybride th, Stack *s, char **tab, size_t *idx)
+void listeMotsTH_rec(const TrieHybride *th, Stack *s, char **tab, size_t *idx)
 {
     if (!th)
         return;
@@ -355,7 +355,7 @@ void listeMotsTH_rec(TrieHybride th, Stack *s, char **tab, size_t *idx)
     }
 }
 
-char **listeMotsTH(TrieHybride th)
+char **listeMotsTH(const TrieHybride *th)
 {
     if (!th)
         return NULL;
@@ -386,21 +386,21 @@ void deleteListeMotsTH(char **tab)
     free(tab);
 }
 
-int comptageNilTH(TrieHybride th)
+int comptageNilTH(const TrieHybride *th)
 {
     if (!th)
         return 1;
     return comptageNilTH(th->inf) + comptageNilTH(th->eq) + comptageNilTH(th->sup);
 }
 
-size_t hauteurTH(TrieHybride th)
+size_t hauteurTH(const TrieHybride *th)
 {
     if (!th || (!th->eq && determine_enfants(th) == AUCUNENF))
         return 0;
     return 1 + MAX3(hauteurTH(th->inf), hauteurTH(th->eq), hauteurTH(th->sup));
 }
 
-void profondeurMoyenneTH_rec(TrieHybride th, int depth, int *sum, int *count)
+void profondeurMoyenneTH_rec(const TrieHybride *th, int depth, int *sum, int *count)
 {
     if (!th)
         return;
@@ -415,7 +415,7 @@ void profondeurMoyenneTH_rec(TrieHybride th, int depth, int *sum, int *count)
     profondeurMoyenneTH_rec(th->sup, depth + 1, sum, count);
 }
 
-int profondeurMoyenneTH(TrieHybride th)
+int profondeurMoyenneTH(const TrieHybride *th)
 {
     int sum = 0, count = 0;
     profondeurMoyenneTH_rec(th, 0, &sum, &count);
@@ -426,20 +426,20 @@ int profondeurMoyenneTH(TrieHybride th)
     return sum / count;
 }
 
-int prefixeTH_rec(TrieHybride th)
+int prefixeTH_rec(const TrieHybride *th)
 {
     if (!th)
         return 0;
     return !!th->value + prefixeTH_rec(th->inf) + prefixeTH_rec(th->eq) + prefixeTH_rec(th->sup);
 }
 
-int prefixeTH(TrieHybride th, const char *cle)
+int prefixeTH(const TrieHybride *th, const char *cle)
 {
     if (!th)
         return 0;
 
-    TrieHybride lastNode = NULL;
-    TrieHybride subtree = th;
+    const TrieHybride *lastNode = NULL;
+    const TrieHybride *subtree = th;
     const char *r = cle;
     char p;
     /* Advance until the subtree that interests us */
@@ -465,7 +465,7 @@ int prefixeTH(TrieHybride th, const char *cle)
     return (!(*r) && lastNode && lastNode->value) + prefixeTH_rec(subtree);
 }
 
-cJSON *constructJSONTH(TrieHybride th)
+cJSON *constructJSONTH(const TrieHybride *th)
 {
     if (!th)
     {
@@ -518,7 +518,7 @@ cJSON *constructJSONTH(TrieHybride th)
     return obj;
 }
 
-char *printJSONTH(TrieHybride th)
+char *printJSONTH(const TrieHybride *th)
 {
     cJSON *js = constructJSONTH(th);
     char *str = cJSON_Print(js);
@@ -526,12 +526,12 @@ char *printJSONTH(TrieHybride th)
     return str;
 }
 
-TrieHybride parseJSONTH_rec(const cJSON *json)
+TrieHybride *parseJSONTH_rec(const cJSON *json)
 {
     if (cJSON_IsNull(json))
         return NULL;
 
-    TrieHybride th = allocTH();
+    TrieHybride *th = allocTH();
     cJSON *obj;
 
     obj = cJSON_GetObjectItemCaseSensitive(json, "char");
@@ -556,7 +556,7 @@ TrieHybride parseJSONTH_rec(const cJSON *json)
     return th;
 }
 
-TrieHybride parseJSONTH(const char *json, size_t sz)
+TrieHybride *parseJSONTH(const char *json, size_t sz)
 {
     cJSON *obj = cJSON_ParseWithLength(json, sz);
     if (!obj)
@@ -569,7 +569,7 @@ TrieHybride parseJSONTH(const char *json, size_t sz)
         }
         exit(1);
     }
-    TrieHybride th = parseJSONTH_rec(obj);
+    TrieHybride *th = parseJSONTH_rec(obj);
     cJSON_Delete(obj);
     return th;
 }

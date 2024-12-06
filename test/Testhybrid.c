@@ -166,11 +166,11 @@ void test_f_ajoutTH_1(void)
 {
     const char *cle = "hello";
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     th = ajoutTH(th, cle, VALFIN);
 
     TEST_ASSERT_NOT_NULL(th);
-    TrieHybride tmp = th;
+    TrieHybride *tmp = th;
     bool foundEndChar = false;
     while (tmp)
     {
@@ -205,11 +205,11 @@ void test_f_ajoutTH_2(void)
     const char *cle1 = "hello";
     const char *cle2 = "pro";
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     th = ajoutTH(th, cle1, VALFIN);
     th = ajoutTH(th, cle2, VALFIN);
 
-    TrieHybride tmp = th;
+    TrieHybride *tmp = th;
     TEST_ASSERT_NOT_NULL(tmp);
     TEST_ASSERT_EQUAL_CHAR('h', tmp->label);
     TEST_ASSERT_EQUAL(VALVIDE, tmp->value);
@@ -253,11 +253,11 @@ void test_f_ajoutTH_3(void)
     const char *cle1 = "hello";
     const char *cle2 = "bro";
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     th = ajoutTH(th, cle1, VALFIN);
     th = ajoutTH(th, cle2, VALFIN);
 
-    TrieHybride tmp = th;
+    TrieHybride *tmp = th;
     TEST_ASSERT_NOT_NULL(tmp);
     TEST_ASSERT_EQUAL_CHAR('h', tmp->label);
     TEST_ASSERT_EQUAL(VALVIDE, tmp->value);
@@ -301,11 +301,11 @@ void test_f_ajoutTH_4(void)
     const char *cle1 = "hello";
     const char *cle2 = "hip";
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     th = ajoutTH(th, cle1, VALFIN);
     th = ajoutTH(th, cle2, VALFIN);
 
-    TrieHybride tmp = th;
+    TrieHybride *tmp = th;
     TEST_ASSERT_NOT_NULL(tmp);
     TEST_ASSERT_EQUAL_CHAR('h', tmp->label);
     TEST_ASSERT_EQUAL(VALVIDE, tmp->value);
@@ -349,11 +349,11 @@ void test_f_ajoutTH_5(void)
     const char *cle1 = "hello";
     const char *cle2 = "hat";
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     th = ajoutTH(th, cle1, VALFIN);
     th = ajoutTH(th, cle2, VALFIN);
 
-    TrieHybride tmp = th;
+    TrieHybride *tmp = th;
     TEST_ASSERT_NOT_NULL(tmp);
     TEST_ASSERT_EQUAL_CHAR('h', tmp->label);
     TEST_ASSERT_EQUAL(VALVIDE, tmp->value);
@@ -397,11 +397,11 @@ void test_f_ajoutTH_6(void)
     const char *cle1 = "hello";
     const char *cle2 = "herd";
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     th = ajoutTH(th, cle1, VALFIN);
     th = ajoutTH(th, cle2, VALFIN);
 
-    TrieHybride tmp = th;
+    TrieHybride *tmp = th;
     TEST_ASSERT_NOT_NULL(tmp);
     TEST_ASSERT_EQUAL_CHAR('h', tmp->label);
     TEST_ASSERT_EQUAL(VALVIDE, tmp->value);
@@ -452,11 +452,11 @@ void test_f_ajoutTH_7(void)
     const char *cle1 = "hello";
     const char *cle2 = "heft";
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     th = ajoutTH(th, cle1, VALFIN);
     th = ajoutTH(th, cle2, VALFIN);
 
-    TrieHybride tmp = th;
+    TrieHybride *tmp = th;
     TEST_ASSERT_NOT_NULL(tmp);
     TEST_ASSERT_EQUAL_CHAR('h', tmp->label);
     TEST_ASSERT_EQUAL(VALVIDE, tmp->value);
@@ -506,11 +506,11 @@ void test_f_ajoutTH_8(void)
     const char *cle1 = "hello";
     const char *cle2 = "hell";
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     th = ajoutTH(th, cle1, VALFIN);
     th = ajoutTH(th, cle2, VALFIN);
 
-    TrieHybride tmp = th;
+    TrieHybride *tmp = th;
     TEST_ASSERT_NOT_NULL(tmp);
     TEST_ASSERT_EQUAL_CHAR('h', tmp->label);
     TEST_ASSERT_EQUAL(VALVIDE, tmp->value);
@@ -552,11 +552,11 @@ void test_f_ajoutTH_9(void)
 {
     const char *cle = "hell";
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     th = ajoutTH(th, cle, 1);
     th = ajoutTH(th, cle, 2);
 
-    TrieHybride tmp = th;
+    TrieHybride *tmp = th;
     TEST_ASSERT_NOT_NULL(tmp);
     TEST_ASSERT_EQUAL_CHAR('h', tmp->label);
     TEST_ASSERT_EQUAL(VALVIDE, tmp->value);
@@ -595,7 +595,7 @@ void test_f_ajoutTH_9(void)
  */
 void test_f_supprTH_1(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     th = supprTH(th, "hello");
     TEST_ASSERT_NULL(th);
@@ -610,7 +610,7 @@ void test_f_supprTH_2(void)
 {
     const char *cle = "hip";
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, cle, VALFIN);
@@ -634,7 +634,7 @@ void test_f_supprTH_3(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "prop";
@@ -673,7 +673,7 @@ void test_f_supprTH_4(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "prop";
@@ -715,7 +715,7 @@ void test_f_supprTH_5(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "prop";
@@ -757,7 +757,7 @@ void test_f_supprTH_6(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "pro";
@@ -791,7 +791,7 @@ void test_f_supprTH_7(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "pro";
@@ -827,7 +827,7 @@ void test_f_supprTH_8(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -867,7 +867,7 @@ void test_f_supprTH_9(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -912,7 +912,7 @@ void test_f_supprTH_10(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -966,7 +966,7 @@ void test_f_supprTH_11(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1020,7 +1020,7 @@ void test_f_supprTH_12(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1083,7 +1083,7 @@ void test_f_supprTH_13(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1146,7 +1146,7 @@ void test_f_supprTH_14(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1200,7 +1200,7 @@ void test_f_supprTH_15(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1254,7 +1254,7 @@ void test_f_supprTH_16(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1294,7 +1294,7 @@ void test_f_supprTH_17(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1339,7 +1339,7 @@ void test_f_supprTH_18(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1393,7 +1393,7 @@ void test_f_supprTH_19(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1447,7 +1447,7 @@ void test_f_supprTH_20(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1510,7 +1510,7 @@ void test_f_supprTH_21(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1573,7 +1573,7 @@ void test_f_supprTH_22(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1627,7 +1627,7 @@ void test_f_supprTH_23(void)
 {
     const char *cle;
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     cle = "her";
@@ -1673,7 +1673,7 @@ void test_f_supprTH_23(void)
 /* Black box test, results on valgrind */
 void test_tiny(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     int p = 1;
     th = ajoutTH(th, "hello", p++);
     th = ajoutTH(th, "help", p++);
@@ -1691,7 +1691,7 @@ void test_base(void)
         TEST_FAIL_MESSAGE("Erreur, malloc");
     strcpy(basic_example_priv, basic_example);
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     char *curr = strtok(basic_example_priv, " ");
     while (curr)
     {
@@ -1711,7 +1711,7 @@ void test_base_suppr(void)
         TEST_FAIL_MESSAGE("Erreur, malloc");
     strcpy(basic_example_priv, basic_example);
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     char *curr = strtok(basic_example_priv, " ");
     while (curr)
     {
@@ -1741,7 +1741,7 @@ void test_shakespeare(void)
     if ((dir = opendir(dir_path)) == NULL)
         TEST_FAIL_MESSAGE("Erreur, opendir");
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
 
     struct dirent *dirent;
     errno = 0;
@@ -1799,7 +1799,7 @@ void test_shakespeare_suppr(void)
     if ((dir = opendir(dir_path)) == NULL)
         TEST_FAIL_MESSAGE("Erreur, opendir");
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
 
     struct dirent *dirent;
     errno = 0;
@@ -1890,7 +1890,7 @@ void test_shakespeare_suppr(void)
 void test_huge(void)
 {
     const char *const path = "test/words.txt";
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
 
     int fd;
     if ((fd = open(path, O_RDONLY)) == -1)
@@ -1925,7 +1925,7 @@ void test_huge(void)
 void test_huge_suppr(void)
 {
     const char *const path = "test/words.txt";
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
 
     int fd;
     if ((fd = open(path, O_RDONLY)) == -1)
@@ -1977,7 +1977,7 @@ void test_huge_suppr(void)
  */
 void test_f_rechercheTH_1(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     TEST_ASSERT_FALSE(rechercheTH(th, "LeBron"));
     deleteTH(&th);
@@ -1990,7 +1990,7 @@ void test_f_rechercheTH_1(void)
  */
 void test_f_rechercheTH_2(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     th = ajoutTH(th, "LeBron", VALFIN);
     TEST_ASSERT_NOT_NULL(th);
@@ -2005,7 +2005,7 @@ void test_f_rechercheTH_2(void)
  */
 void test_f_rechercheTH_3(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     th = ajoutTH(th, "help", VALFIN);
     TEST_ASSERT_NOT_NULL(th);
@@ -2022,7 +2022,7 @@ void test_f_rechercheTH_3(void)
  */
 void test_f_rechercheTH_4(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     th = ajoutTH(th, "help", VALFIN);
     TEST_ASSERT_NOT_NULL(th);
@@ -2046,7 +2046,7 @@ void test_f_rechercheTH_shakes(void)
     if ((dir = opendir(dir_path)) == NULL)
         TEST_FAIL_MESSAGE("Erreur, opendir");
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
 
     struct dirent *dirent;
     errno = 0;
@@ -2139,7 +2139,7 @@ void test_f_rechercheTH_shakes(void)
  */
 void test_f_comptageMotsTH_1(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     TEST_ASSERT_EQUAL(0, comptageMotsTH(th));
     deleteTH(&th);
@@ -2152,7 +2152,7 @@ void test_f_comptageMotsTH_1(void)
  */
 void test_f_comptageMotsTH_2(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     th = ajoutTH(th, "hello", VALFIN);
     th = ajoutTH(th, "help", VALFIN);
@@ -2177,7 +2177,7 @@ void test_f_comptageMotsTH_shakes(void)
     if ((dir = opendir(dir_path)) == NULL)
         TEST_FAIL_MESSAGE("Erreur, opendir");
 
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
 
     struct dirent *dirent;
     errno = 0;
@@ -2235,7 +2235,7 @@ void test_f_comptageMotsTH_shakes(void)
  */
 void test_f_hauteurTH_1(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     TEST_ASSERT_EQUAL(0, hauteurTH(th));
     deleteTH(&th);
@@ -2248,7 +2248,7 @@ void test_f_hauteurTH_1(void)
  */
 void test_f_hauteurTH_2(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     th = ajoutTH(th, "hello", VALFIN);
     TEST_ASSERT_NOT_NULL(th);
@@ -2263,7 +2263,7 @@ void test_f_hauteurTH_2(void)
  */
 void test_f_hauteurTH_3(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     th = ajoutTH(th, "hello", VALFIN);
     th = ajoutTH(th, "help", VALFIN);
@@ -2281,7 +2281,7 @@ void test_f_hauteurTH_3(void)
  */
 void test_f_listeMotsTH_1(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
     char **res = listeMotsTH(th);
     TEST_ASSERT_NULL(res);
@@ -2296,7 +2296,7 @@ void test_f_listeMotsTH_1(void)
  */
 void test_f_listeMotsTH_2(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2329,7 +2329,7 @@ void test_f_listeMotsTH_2(void)
  */
 void test_f_comptageNilTH_1(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     TEST_ASSERT_EQUAL(1, comptageNilTH(th));
@@ -2344,7 +2344,7 @@ void test_f_comptageNilTH_1(void)
  */
 void test_f_comptageNilTH_2(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2364,7 +2364,7 @@ void test_f_comptageNilTH_2(void)
  */
 void test_f_profondeurMoyenneTH_1(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     TEST_ASSERT_EQUAL(-1, profondeurMoyenneTH(th));
@@ -2379,7 +2379,7 @@ void test_f_profondeurMoyenneTH_1(void)
  */
 void test_f_profondeurMoyenneTH_2(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2399,7 +2399,7 @@ void test_f_profondeurMoyenneTH_2(void)
  */
 void test_f_prefixeTH_1(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     TEST_ASSERT_EQUAL(0, prefixeTH(th, "LeBron"));
@@ -2416,7 +2416,7 @@ void test_f_prefixeTH_1(void)
  */
 void test_f_prefixeTH_2(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2439,7 +2439,7 @@ void test_f_prefixeTH_2(void)
  */
 void test_f_prefixeTH_3(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2462,7 +2462,7 @@ void test_f_prefixeTH_3(void)
  */
 void test_f_prefixeTH_4(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2485,7 +2485,7 @@ void test_f_prefixeTH_4(void)
  */
 void test_f_prefixeTH_5(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2506,7 +2506,7 @@ void test_f_prefixeTH_5(void)
  */
 void test_f_prefixeTH_6(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2527,7 +2527,7 @@ void test_f_prefixeTH_6(void)
  */
 void test_f_prefixeTH_7(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2548,7 +2548,7 @@ void test_f_prefixeTH_7(void)
  */
 void test_f_prefixeTH_8(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2569,7 +2569,7 @@ void test_f_prefixeTH_8(void)
  */
 void test_f_prefixeTH_9(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2590,7 +2590,7 @@ void test_f_prefixeTH_9(void)
  */
 void test_f_prefixeTH_10(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);
@@ -2611,7 +2611,7 @@ void test_f_prefixeTH_10(void)
  */
 void test_f_prefixeTH_11(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
 
     th = ajoutTH(th, "hello", VALFIN);

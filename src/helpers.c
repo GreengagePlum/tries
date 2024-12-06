@@ -2,7 +2,7 @@
  * @file helpers.c
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier source contenant les corps des fonctions pour gérer l'interface utilisateur
- * @version 0.1
+ * @version 0.2
  * @date 2024-12-05
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -25,7 +25,7 @@ void insererPT(void)
 
 void insererTH(void)
 {
-    TrieHybride th = newTH();
+    TrieHybride *th = newTH();
     long count = 1;
     ssize_t sz;
     size_t cap = 0;
@@ -92,7 +92,7 @@ void suppressionTH(const char *path)
         exit(1);
     }
 
-    TrieHybride th = parseJSONTH(s, fsize);
+    TrieHybride *th = parseJSONTH(s, fsize);
     free(s);
 
     ssize_t sz;
