@@ -2,7 +2,7 @@
  * @file hybrid.c
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier source contenant les corps des fonctions pour le Trie Hybride
- * @version 0.4
+ * @version 0.5
  * @date 2024-11-18
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -545,6 +545,7 @@ char *printJSONTH(const TrieHybride *th)
 {
     cJSON *js = constructJSONTH(th);
     char *str = cJSON_Print(js);
+    /* TODO: Check if cJSON is null and skip output completely (vanity) */
     cJSON_Delete(js);
     return str;
 }
@@ -596,3 +597,60 @@ TrieHybride *parseJSONTH(const char *json, size_t sz)
     cJSON_Delete(obj);
     return th;
 }
+
+TrieHybride *fusionTH_rec(TrieHybride *restrict t1, TrieHybride *restrict t2, TrieHybride **t2_parent)
+{
+    if (!t2)
+        return t1;
+    if (!t1)
+    {
+        *t2_parent = NULL;
+        return t2;
+    }
+
+    if (t2->label < t1->label)
+    {
+        t1->inf = fusionTH_rec(t1->inf, t2, t2_parent);
+    }
+    else if (t2->label > t1->label)
+    {
+        t1->sup = fusionTH_rec(t1->sup, t2, t2_parent);
+    }
+    else
+    {
+        t1->value |= t2->value;
+        t1->inf = fusionTH_rec(t1->inf, t2->inf, &t2->inf);
+        t1->eq = fusionTH_rec(t1->eq, t2->eq, &t2->eq);
+        t1->sup = fusionTH_rec(t1->sup, t2->sup, &t2->sup);
+    }
+
+    return t1;
+}
+
+TrieHybride *fusionTH(TrieHybride **restrict th1, TrieHybride **restrict th2)
+{
+    assert(th1 && "Contract violated, null pointer passed in");
+    assert(th2 && "Contract violated, null pointer passed in");
+
+    TrieHybride *th;
+    if (!*th1)
+    {
+        th = *th2;
+        *th2 = NULL;
+        return th;
+    }
+    if (!*th2)
+    {
+        th = *th1;
+        *th1 = NULL;
+        return th;
+    }
+    th = fusionTH_rec(*th1, *th2, th2);
+    *th1 = NULL;
+    deleteTH(th2);
+    return th;
+}
+
+/* TrieHybride *fusionCopieTH(const TrieHybride *restrict th1, const TrieHybride *restrict th2) */
+/* { */
+/* } */

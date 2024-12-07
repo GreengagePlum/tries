@@ -2,7 +2,7 @@
  * @file helpers.c
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier source contenant les corps des fonctions pour gérer l'interface utilisateur
- * @version 0.2
+ * @version 0.3
  * @date 2024-12-05
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -166,6 +166,56 @@ void suppressionTH(const char *path)
     }
     free(s);
     deleteTH(&th);
+}
+
+void fusionMainPT(const char *path1, const char *path2)
+{
+    (void)path1;
+    (void)path2;
+    fprintf(stderr, "Fonctionnalité pas encore implanté");
+    exit(1);
+}
+
+void fusionMainTH(const char *path1, const char *path2)
+{
+    FILE *f1 = fopen(path1, "r");
+    if (!f1)
+    {
+        perror("Erreur, fopen dans profondeurMoyenneMainTH");
+        exit(1);
+    }
+    FILE *f2 = fopen(path2, "r");
+    if (!f2)
+    {
+        perror("Erreur, fopen dans profondeurMoyenneMainTH");
+        exit(1);
+    }
+
+    size_t fsize;
+    char *s;
+    s = readJSON(f1, &fsize);
+    TrieHybride *th1 = parseJSONTH(s, fsize);
+    free(s);
+    s = readJSON(f2, &fsize);
+    TrieHybride *th2 = parseJSONTH(s, fsize);
+    free(s);
+
+    th1 = fusionTH(&th1, &th2);
+    s = printJSONTH(th1);
+    printf("%s", s);
+    free(s);
+
+    if (fclose(f1) == EOF)
+    {
+        perror("Erreur, fclose dans profondeurMoyenneMainTH");
+        exit(1);
+    }
+    if (fclose(f2) == EOF)
+    {
+        perror("Erreur, fclose dans profondeurMoyenneMainTH");
+        exit(1);
+    }
+    deleteTH(&th1);
 }
 
 void listeMotsMainPT(const char *path)

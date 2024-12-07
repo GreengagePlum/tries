@@ -2696,6 +2696,171 @@ void test_f_prefixeTH_11(void)
     deleteTH(&th);
 }
 
+/* Black box test
+ *
+ * case #1:
+ * merge two empty tries
+ */
+void test_f_fusionTH_1(void)
+{
+    TrieHybride *th1 = newTH();
+    TEST_ASSERT_NULL(th1);
+    TrieHybride *th2 = newTH();
+    TEST_ASSERT_NULL(th2);
+
+    TrieHybride *tf = fusionTH(&th1, &th2);
+    TEST_ASSERT_NULL(tf);
+    TEST_ASSERT_NULL(th1);
+    TEST_ASSERT_NULL(th2);
+
+    deleteTH(&tf);
+}
+
+/* Black box test
+ *
+ * case #2:
+ * merge two tries where one is empty
+ */
+void test_f_fusionTH_2(void)
+{
+    TrieHybride *th1 = newTH();
+    TEST_ASSERT_NULL(th1);
+    TrieHybride *th2 = newTH();
+    TEST_ASSERT_NULL(th2);
+
+    th1 = ajoutTH(th1, "car", VALFIN);
+    th1 = ajoutTH(th1, "cat", VALFIN);
+    TEST_ASSERT_NOT_NULL(th1);
+
+    TrieHybride *tf = fusionTH(&th1, &th2);
+    TEST_ASSERT_NOT_NULL(tf);
+    TEST_ASSERT_NULL(th1);
+    TEST_ASSERT_NULL(th2);
+
+    char **l = listeMotsTH(tf);
+    TEST_ASSERT_NOT_NULL(l);
+    TEST_ASSERT_NOT_NULL(l[0]);
+    TEST_ASSERT_NOT_NULL(l[1]);
+    TEST_ASSERT_NULL(l[2]);
+    TEST_ASSERT_EQUAL_STRING("car", l[0]);
+    TEST_ASSERT_EQUAL_STRING("cat", l[1]);
+
+    deleteListeMotsTH(l);
+    deleteTH(&tf);
+}
+
+/* Black box test
+ *
+ * case #3:
+ * merge two tries where one is empty
+ */
+void test_f_fusionTH_3(void)
+{
+    TrieHybride *th1 = newTH();
+    TEST_ASSERT_NULL(th1);
+    TrieHybride *th2 = newTH();
+    TEST_ASSERT_NULL(th2);
+
+    th1 = ajoutTH(th1, "car", VALFIN);
+    th1 = ajoutTH(th1, "cat", VALFIN);
+    TEST_ASSERT_NOT_NULL(th1);
+
+    TrieHybride *tf = fusionTH(&th2, &th1);
+    TEST_ASSERT_NOT_NULL(tf);
+    TEST_ASSERT_NULL(th1);
+    TEST_ASSERT_NULL(th2);
+
+    char **l = listeMotsTH(tf);
+    TEST_ASSERT_NOT_NULL(l);
+    TEST_ASSERT_NOT_NULL(l[0]);
+    TEST_ASSERT_NOT_NULL(l[1]);
+    TEST_ASSERT_NULL(l[2]);
+    TEST_ASSERT_EQUAL_STRING("car", l[0]);
+    TEST_ASSERT_EQUAL_STRING("cat", l[1]);
+
+    deleteListeMotsTH(l);
+    deleteTH(&tf);
+}
+
+/* Black box test
+ *
+ * case #4:
+ * merge two tries where none is empty
+ */
+void test_f_fusionTH_4(void)
+{
+    TrieHybride *th1 = newTH();
+    TEST_ASSERT_NULL(th1);
+    TrieHybride *th2 = newTH();
+    TEST_ASSERT_NULL(th2);
+
+    th1 = ajoutTH(th1, "car", VALFIN);
+    th1 = ajoutTH(th1, "cat", VALFIN);
+    TEST_ASSERT_NOT_NULL(th1);
+
+    th2 = ajoutTH(th2, "cat", VALFIN);
+    th2 = ajoutTH(th2, "dog", VALFIN);
+    TEST_ASSERT_NOT_NULL(th2);
+
+    TrieHybride *tf = fusionTH(&th1, &th2);
+    TEST_ASSERT_NOT_NULL(tf);
+    TEST_ASSERT_NULL(th1);
+    TEST_ASSERT_NULL(th2);
+
+    char **l = listeMotsTH(tf);
+    TEST_ASSERT_NOT_NULL(l);
+    TEST_ASSERT_NOT_NULL(l[0]);
+    TEST_ASSERT_NOT_NULL(l[1]);
+    TEST_ASSERT_NOT_NULL(l[2]);
+    TEST_ASSERT_NULL(l[3]);
+    TEST_ASSERT_EQUAL_STRING("car", l[0]);
+    TEST_ASSERT_EQUAL_STRING("cat", l[1]);
+    TEST_ASSERT_EQUAL_STRING("dog", l[2]);
+
+    deleteListeMotsTH(l);
+    deleteTH(&tf);
+}
+
+/* Black box test
+ *
+ * case #5:
+ * merge two tries where none is empty,
+ * possibly duplicate producing scenario for certain algorithm implementations
+ */
+void test_f_fusionTH_5(void)
+{
+    TrieHybride *th1 = newTH();
+    TEST_ASSERT_NULL(th1);
+    TrieHybride *th2 = newTH();
+    TEST_ASSERT_NULL(th2);
+
+    th1 = ajoutTH(th1, "cat", VALFIN);
+    th1 = ajoutTH(th1, "bat", VALFIN);
+    TEST_ASSERT_NOT_NULL(th1);
+
+    th2 = ajoutTH(th2, "art", VALFIN);
+    th2 = ajoutTH(th2, "bat", VALFIN);
+    TEST_ASSERT_NOT_NULL(th2);
+
+    TrieHybride *tf = fusionTH(&th1, &th2);
+    TEST_ASSERT_NOT_NULL(tf);
+    TEST_ASSERT_NULL(th1);
+    TEST_ASSERT_NULL(th2);
+
+    char **l = listeMotsTH(tf);
+    TEST_ASSERT_NOT_NULL(l);
+    TEST_ASSERT_NOT_NULL(l[0]);
+    TEST_ASSERT_NOT_NULL(l[1]);
+    TEST_ASSERT_NOT_NULL(l[2]);
+    TEST_ASSERT_NULL(l[3]);
+    TEST_ASSERT_EQUAL_STRING("art", l[0]);
+    TEST_ASSERT_EQUAL_STRING("bat", l[1]);
+    TEST_ASSERT_EQUAL_STRING("cat", l[2]);
+
+    deleteListeMotsTH(l);
+    deleteTH(&tf);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -2773,5 +2938,10 @@ int main(void)
     RUN_TEST(test_f_prefixeTH_9);
     RUN_TEST(test_f_prefixeTH_10);
     RUN_TEST(test_f_prefixeTH_11);
+    RUN_TEST(test_f_fusionTH_1);
+    RUN_TEST(test_f_fusionTH_2);
+    RUN_TEST(test_f_fusionTH_3);
+    RUN_TEST(test_f_fusionTH_4);
+    RUN_TEST(test_f_fusionTH_5);
     return UNITY_END();
 }

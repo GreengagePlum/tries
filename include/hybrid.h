@@ -4,7 +4,7 @@
  * @file hybrid.h
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier d'entête contenant les déclaration des fonctions pour le Trie Hybride
- * @version 0.4
+ * @version 0.5
  * @date 2024-11-18
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -261,5 +261,42 @@ char *printJSONTH(const TrieHybride *th);
  *
  */
 TrieHybride *parseJSONTH(const char *json, size_t sz);
+
+/**
+ * @brief Fusionne deux Tries Hybrides donnés
+ *
+ * @param [in] th1 Un pointeur de pointeur vers le Trie Hybride à fusionner
+ * @param [in] th2 Un pointeur de pointeur vers le Trie Hybride à fusionner
+ * @return Un pointeur vers le Trie Hybride résultant de la fusion
+ *
+ * @pre @a th1 et @a th2 ne sont pas nul
+ * @pre Les zones mémoire des deux tries données sont bien distinctes
+ * @post @a th1 et @a th2 pointent sur nul
+ *
+ * Le deuxième Trie Hybride @a th2 est fusionné au premier Trie Hybride @a th1. C'est une fusion dit "in place", sans
+ * utiliser de l'espace mémoire secondaire (pas d'allocation nouveau). Les noeuds des deux tries sont réutilisés pour
+ * construire un troisième trie.
+ * De ce fait, @a th1 pointe sur nul à la fin (tous ses noeuds ont été forcément consommés). Même si tous les noeuds de
+ * @a th2 ne sont pas forcément consommés par la fusion (doublons), il est désalloué et donc pointe sur nul aussi. Il
+ * est donc recommandé de réassigner un des pointeurs passé en argument au retour de cette fonction. Les tries pointé
+ * par @a th1 et @a th2 seront vide donc les désallouer avec @c deleteTH n'est pas nécessaire.
+ *
+ */
+TrieHybride *fusionTH(TrieHybride **restrict th1, TrieHybride **restrict th2);
+
+/**
+ * @brief Fusionne deux Tries Hybrides donnés
+ *
+ * @param [in] th1 Un pointeur vers le Trie Hybride à fusionner
+ * @param [in] th2 Un pointeur vers le Trie Hybride à fusionner
+ * @return Un pointeur vers le Trie Hybride résultant de la fusion
+ *
+ * Le deuxième Trie Hybride @a th2 est fusionné au premier Trie Hybride @a th1.
+ * Les deux tries sont seulement parcourus en lecture. Le Trie Hybride retourné consiste seulement des noeuds
+ * nouvellement alloué indépendants.
+ * @a th1 et @a th2 restent comme tel et doivent être désalloués par l'appellant.
+ *
+ */
+TrieHybride *fusionCopieTH(const TrieHybride *restrict th1, const TrieHybride *restrict th2);
 
 #endif

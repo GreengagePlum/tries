@@ -2,7 +2,7 @@
  * @file main.c
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier d'entrée dans le programme contenant la logique haut niveau des opérations
- * @version 0.2
+ * @version 0.3
  * @date 2024-11-18
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -74,6 +74,20 @@ int main(int argc, char *argv[])
         }
         break;
     case FUSION:
+        if (argc != 5)
+        {
+            fprintf(stderr, "usage: %s %d <TrieType> <arbre1.json> <arbre2.json>", argv[0], FUSION);
+            exit(1);
+        }
+        if (tt == PATRICIA)
+            fusionMainPT(argv[3], argv[4]);
+        else if (tt == HYBRID)
+            fusionMainTH(argv[3], argv[4]);
+        else
+        {
+            fprintf(stderr, "Erreur, TrieType [%d] inconnu", tt);
+            exit(1);
+        }
         break;
     case LISTEMOTS:
         if (argc != 4)

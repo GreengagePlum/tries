@@ -4,7 +4,7 @@
  * @file helpers.h
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier d'entête contenant les déclaration des fonctions pour gérer l'interface utilisateur du programme
- * @version 0.1
+ * @version 0.2
  * @date 2024-12-05
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
@@ -128,5 +128,27 @@ void prefixeMainPT(const char *path, const char *cle);
  *
  */
 void prefixeMainTH(const char *path, const char *cle);
+
+/**
+ * @brief Lit les deux Patricia-Trie depuis les fichiers JSON donnés en argument, écrit le trie résultant de leur
+ * fusion sur la sortie standard
+ *
+ * @param [in] path1 Une chaine de caractères (nul terminé) constituant le chemin vers un fichier JSON d'un
+ * Patricia-Trie
+ * @param [in] path2 Une chaine de caractères (nul terminé) constituant le chemin vers un fichier JSON d'un
+ * Patricia-Trie
+ *
+ */
+void fusionMainPT(const char *path1, const char *path2);
+
+/**
+ * @brief Lit les deux Tries Hybrides depuis les fichiers JSON donnés en argument, écrit le trie résultant de leur
+ * fusion sur la sortie standard
+ *
+ * @param [in] path1 Une chaine de caractères (nul terminé) constituant le chemin vers un fichier JSON d'un Trie Hybride
+ * @param [in] path2 Une chaine de caractères (nul terminé) constituant le chemin vers un fichier JSON d'un Trie Hybride
+ *
+ */
+void fusionMainTH(const char *path1, const char *path2);
 
 #endif
