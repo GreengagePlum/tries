@@ -348,6 +348,16 @@ char *snapshotStack(Stack *s)
     return ret;
 }
 
+const char *readStack(Stack *s)
+{
+    if (!s)
+        return NULL;
+    if (s->sz == 0)
+        return NULL;
+    s->tab[s->sz] = '\0';
+    return s->tab;
+}
+
 void listeMotsTH_rec(const TrieHybride *th, Stack *s, char **tab, size_t *idx)
 {
     if (!th)
@@ -598,59 +608,35 @@ TrieHybride *parseJSONTH(const char *json, size_t sz)
     return th;
 }
 
-TrieHybride *fusionTH_rec(TrieHybride *restrict t1, TrieHybride *restrict t2, TrieHybride **t2_parent)
+TrieHybride *fusionTH_rec(TrieHybride *restrict th1, const TrieHybride *restrict th2, Stack *s)
 {
-    if (!t2)
-        return t1;
-    if (!t1)
-    {
-        *t2_parent = NULL;
-        return t2;
-    }
-
-    if (t2->label < t1->label)
-    {
-        t1->inf = fusionTH_rec(t1->inf, t2, t2_parent);
-    }
-    else if (t2->label > t1->label)
-    {
-        t1->sup = fusionTH_rec(t1->sup, t2, t2_parent);
-    }
-    else
-    {
-        t1->value |= t2->value;
-        t1->inf = fusionTH_rec(t1->inf, t2->inf, &t2->inf);
-        t1->eq = fusionTH_rec(t1->eq, t2->eq, &t2->eq);
-        t1->sup = fusionTH_rec(t1->sup, t2->sup, &t2->sup);
-    }
-
-    return t1;
+    if (!th2)
+        return th1;
+    th1 = fusionTH_rec(th1, th2->inf, s);
+    pushStack(s, th2->label);
+    if (th2->value)
+        th1 = ajoutTH(th1, readStack(s), VALFIN);
+    th1 = fusionTH_rec(th1, th2->eq, s);
+    popStack(s);
+    th1 = fusionTH_rec(th1, th2->sup, s);
+    return th1;
 }
 
-TrieHybride *fusionTH(TrieHybride **restrict th1, TrieHybride **restrict th2)
+TrieHybride *fusionTH(TrieHybride **restrict th1, const TrieHybride *restrict th2)
 {
     assert(th1 && "Contract violated, null pointer passed in");
-    assert(th2 && "Contract violated, null pointer passed in");
-
-    TrieHybride *th;
-    if (!*th1)
-    {
-        th = *th2;
-        *th2 = NULL;
-        return th;
-    }
-    if (!*th2)
-    {
-        th = *th1;
-        *th1 = NULL;
-        return th;
-    }
-    th = fusionTH_rec(*th1, *th2, th2);
+    Stack s = newStack(hauteurTH(th2) + 1);
+    TrieHybride *th = fusionTH_rec(*th1, th2, &s);
+    assert(s.sz == 0 && "La pile des caractères doit être vide à cet instant");
+    freeStack(s);
     *th1 = NULL;
-    deleteTH(th2);
     return th;
 }
 
-/* TrieHybride *fusionCopieTH(const TrieHybride *restrict th1, const TrieHybride *restrict th2) */
-/* { */
-/* } */
+TrieHybride *fusionCopieTH(const TrieHybride *restrict th1, const TrieHybride *restrict th2)
+{
+    TrieHybride *th = newTH();
+    th = fusionTH(&th, th1);
+    th = fusionTH(&th, th2);
+    return th;
+}

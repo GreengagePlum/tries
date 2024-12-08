@@ -265,24 +265,24 @@ TrieHybride *parseJSONTH(const char *json, size_t sz);
 /**
  * @brief Fusionne deux Tries Hybrides donnés
  *
- * @param [in] th1 Un pointeur de pointeur vers le Trie Hybride à fusionner
- * @param [in] th2 Un pointeur de pointeur vers le Trie Hybride à fusionner
+ * @param [in,out] th1 Un pointeur de pointeur vers le Trie Hybride à fusionner
+ * @param [in] th2 Un pointeur vers le Trie Hybride à fusionner
  * @return Un pointeur vers le Trie Hybride résultant de la fusion
  *
- * @pre @a th1 et @a th2 ne sont pas nul
+ * @pre @a th1 n'est pas nul
  * @pre Les zones mémoire des deux tries données sont bien distinctes
- * @post @a th1 et @a th2 pointent sur nul
  *
- * Le deuxième Trie Hybride @a th2 est fusionné au premier Trie Hybride @a th1. C'est une fusion dit "in place", sans
- * utiliser de l'espace mémoire secondaire (pas d'allocation nouveau). Les noeuds des deux tries sont réutilisés pour
- * construire un troisième trie.
- * De ce fait, @a th1 pointe sur nul à la fin (tous ses noeuds ont été forcément consommés). Même si tous les noeuds de
- * @a th2 ne sont pas forcément consommés par la fusion (doublons), il est désalloué et donc pointe sur nul aussi. Il
- * est donc recommandé de réassigner un des pointeurs passé en argument au retour de cette fonction. Les tries pointé
- * par @a th1 et @a th2 seront vide donc les désallouer avec @c deleteTH n'est pas nécessaire.
+ * @post @a th1 pointe sur nul
+ *
+ * Le deuxième Trie Hybride @a th2 est fusionné au premier Trie Hybride @a th1. C'est une fusion dit semi "in place",
+ * sans utiliser de l'espace mémoire secondaire (pas d'allocation de tout un nouveau trie de zéro). Les noeuds de @a th1
+ * sont réutilisés pour construire un troisième trie. De ce fait, @a th1 pointe sur nul à la fin (tous ses noeuds
+ * ont été forcément consommés). Il est donc recommandé de réassigner le pointeur @a th1 passé en argument au retour de
+ * cette fonction. @a th2 reste identique et n'est accédé qu'en lecture. Le trie pointé par @a th2 est donc à désallouer
+ * par l'appellant avec @c deleteTH contrairement à @a th1.
  *
  */
-TrieHybride *fusionTH(TrieHybride **restrict th1, TrieHybride **restrict th2);
+TrieHybride *fusionTH(TrieHybride **restrict th1, const TrieHybride *restrict th2);
 
 /**
  * @brief Fusionne deux Tries Hybrides donnés

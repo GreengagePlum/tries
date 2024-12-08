@@ -200,7 +200,7 @@ void fusionMainTH(const char *path1, const char *path2)
     TrieHybride *th2 = parseJSONTH(s, fsize);
     free(s);
 
-    th1 = fusionTH(&th1, &th2);
+    th1 = fusionTH(&th1, th2);
     s = printJSONTH(th1);
     printf("%s", s);
     free(s);
@@ -216,6 +216,7 @@ void fusionMainTH(const char *path1, const char *path2)
         exit(1);
     }
     deleteTH(&th1);
+    deleteTH(&th2);
 }
 
 void listeMotsMainPT(const char *path)

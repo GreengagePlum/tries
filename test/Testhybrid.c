@@ -2708,12 +2708,12 @@ void test_f_fusionTH_1(void)
     TrieHybride *th2 = newTH();
     TEST_ASSERT_NULL(th2);
 
-    TrieHybride *tf = fusionTH(&th1, &th2);
+    TrieHybride *tf = fusionTH(&th1, th2);
     TEST_ASSERT_NULL(tf);
     TEST_ASSERT_NULL(th1);
-    TEST_ASSERT_NULL(th2);
 
     deleteTH(&tf);
+    deleteTH(&th2);
 }
 
 /* Black box test
@@ -2732,10 +2732,9 @@ void test_f_fusionTH_2(void)
     th1 = ajoutTH(th1, "cat", VALFIN);
     TEST_ASSERT_NOT_NULL(th1);
 
-    TrieHybride *tf = fusionTH(&th1, &th2);
+    TrieHybride *tf = fusionTH(&th1, th2);
     TEST_ASSERT_NOT_NULL(tf);
     TEST_ASSERT_NULL(th1);
-    TEST_ASSERT_NULL(th2);
 
     char **l = listeMotsTH(tf);
     TEST_ASSERT_NOT_NULL(l);
@@ -2747,6 +2746,7 @@ void test_f_fusionTH_2(void)
 
     deleteListeMotsTH(l);
     deleteTH(&tf);
+    deleteTH(&th2);
 }
 
 /* Black box test
@@ -2765,9 +2765,8 @@ void test_f_fusionTH_3(void)
     th1 = ajoutTH(th1, "cat", VALFIN);
     TEST_ASSERT_NOT_NULL(th1);
 
-    TrieHybride *tf = fusionTH(&th2, &th1);
+    TrieHybride *tf = fusionTH(&th2, th1);
     TEST_ASSERT_NOT_NULL(tf);
-    TEST_ASSERT_NULL(th1);
     TEST_ASSERT_NULL(th2);
 
     char **l = listeMotsTH(tf);
@@ -2780,6 +2779,7 @@ void test_f_fusionTH_3(void)
 
     deleteListeMotsTH(l);
     deleteTH(&tf);
+    deleteTH(&th1);
 }
 
 /* Black box test
@@ -2802,10 +2802,9 @@ void test_f_fusionTH_4(void)
     th2 = ajoutTH(th2, "dog", VALFIN);
     TEST_ASSERT_NOT_NULL(th2);
 
-    TrieHybride *tf = fusionTH(&th1, &th2);
+    TrieHybride *tf = fusionTH(&th1, th2);
     TEST_ASSERT_NOT_NULL(tf);
     TEST_ASSERT_NULL(th1);
-    TEST_ASSERT_NULL(th2);
 
     char **l = listeMotsTH(tf);
     TEST_ASSERT_NOT_NULL(l);
@@ -2819,6 +2818,7 @@ void test_f_fusionTH_4(void)
 
     deleteListeMotsTH(l);
     deleteTH(&tf);
+    deleteTH(&th2);
 }
 
 /* Black box test
@@ -2842,10 +2842,9 @@ void test_f_fusionTH_5(void)
     th2 = ajoutTH(th2, "bat", VALFIN);
     TEST_ASSERT_NOT_NULL(th2);
 
-    TrieHybride *tf = fusionTH(&th1, &th2);
+    TrieHybride *tf = fusionTH(&th1, th2);
     TEST_ASSERT_NOT_NULL(tf);
     TEST_ASSERT_NULL(th1);
-    TEST_ASSERT_NULL(th2);
 
     char **l = listeMotsTH(tf);
     TEST_ASSERT_NOT_NULL(l);
@@ -2859,6 +2858,49 @@ void test_f_fusionTH_5(void)
 
     deleteListeMotsTH(l);
     deleteTH(&tf);
+    deleteTH(&th2);
+}
+
+/* Black box test
+ *
+ * case #1:
+ * merge two tries where none is empty,
+ * possibly duplicate producing scenario for certain algorithm implementations
+ */
+void test_f_fusionCopieTH_1(void)
+{
+    TrieHybride *th1 = newTH();
+    TEST_ASSERT_NULL(th1);
+    TrieHybride *th2 = newTH();
+    TEST_ASSERT_NULL(th2);
+
+    th1 = ajoutTH(th1, "cat", VALFIN);
+    th1 = ajoutTH(th1, "bat", VALFIN);
+    TEST_ASSERT_NOT_NULL(th1);
+
+    th2 = ajoutTH(th2, "art", VALFIN);
+    th2 = ajoutTH(th2, "bat", VALFIN);
+    TEST_ASSERT_NOT_NULL(th2);
+
+    TrieHybride *tf = fusionCopieTH(th1, th2);
+    TEST_ASSERT_NOT_NULL(tf);
+    TEST_ASSERT_NOT_NULL(th1);
+    TEST_ASSERT_NOT_NULL(th2);
+
+    char **l = listeMotsTH(tf);
+    TEST_ASSERT_NOT_NULL(l);
+    TEST_ASSERT_NOT_NULL(l[0]);
+    TEST_ASSERT_NOT_NULL(l[1]);
+    TEST_ASSERT_NOT_NULL(l[2]);
+    TEST_ASSERT_NULL(l[3]);
+    TEST_ASSERT_EQUAL_STRING("art", l[0]);
+    TEST_ASSERT_EQUAL_STRING("bat", l[1]);
+    TEST_ASSERT_EQUAL_STRING("cat", l[2]);
+
+    deleteListeMotsTH(l);
+    deleteTH(&tf);
+    deleteTH(&th1);
+    deleteTH(&th2);
 }
 
 int main(void)
@@ -2943,5 +2985,6 @@ int main(void)
     RUN_TEST(test_f_fusionTH_3);
     RUN_TEST(test_f_fusionTH_4);
     RUN_TEST(test_f_fusionTH_5);
+    RUN_TEST(test_f_fusionCopieTH_1);
     return UNITY_END();
 }
