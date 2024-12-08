@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Check if exactly two arguments are provided
-if [ "$#" -ne 3 ]; then
+if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <x> <y>"
     echo "x: A JSON file representing a Patricia-Trie tree"
     echo "y: A JSON file representing a Patricia-Trie tree"
