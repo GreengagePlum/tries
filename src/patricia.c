@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 
 
@@ -24,10 +25,25 @@
 PatriciaNode *create_patricia_node(){
     PatriciaNode *node = (PatriciaNode *)malloc(sizeof(PatriciaNode));
     for(int i = 0; i < ASCII_SIZE; i++){
-        node->prefixes[i] = NULL;
         node->children[i] = NULL;
     }
+    node->label = NULL;
     return node;
+}
+
+void free_patricia(PatriciaNode *node){
+    if(!node){
+        return;
+    }
+    for(int i = 0; i < ASCII_SIZE; i++){
+        if(node->children[i]){
+            free_patricia(node->children[i]);
+        }
+    }
+    if(node->label){
+        free(node->label);
+    }
+    free(node);
 }
 
 /**
@@ -41,84 +57,80 @@ void insert_patricia(PatriciaNode* patricia, const char* word) {
     const char* rest = word;
 
     while (*rest) {
-        int index = (unsigned char)(*rest);  //indice, qui est le premier char du mot
+        int index = (unsigned char)(*rest); 
 
-        // Cas 1: il n'y a pas de prefixe qui commence par le char donc on peut inserer 
-        if (curr->prefixes[index] == NULL) {
+        // cas 1 : word n'est pas prefixe dans l'arbre
+        if (curr->children[index] == NULL) {
             size_t len = strlen(rest);
-            char* temp = malloc(len + 2);  // +2 pour EOE_CHAR et '\0'
+            char* temp = (char*)malloc(len + 2); 
             strcpy(temp, rest);
             temp[len] = EOE_CHAR;
             temp[len + 1] = '\0';
 
-            curr->prefixes[index] = temp; 
+            curr->children[index] = create_patricia_node();
+            curr->children[index]->label = temp;
             return;
         }
 
-        // Cas 2 Il existe un prefixe
-        char* prefix = curr->prefixes[index];
-        int prefix_len = plus_long_pref(prefix, rest);  
+        // Cas 2 : il y a un prefixe
+        PatriciaNode* child = curr->children[index];
+        int prefix_len = plus_long_pref(child->label, rest);
 
-        // le prefixe ne va plus terminer ici donc on bouge l'EOE CHAR
-        if (prefix[prefix_len] == EOE_CHAR) {
-            if (curr->children[index] == NULL) {
-                curr->children[index] = create_patricia_node();
-            }
-            curr->children[index]->prefixes[EOE_INDEX] = strdup("\x01");  
-            prefix[prefix_len] = '\0';  
-        }
 
-        // Cas 2a: match complet
-        if (prefix_len == (int)strlen(prefix)) {
-            rest += prefix_len;  
-
-            if (*rest) {
-                if (curr->children[index] == NULL) {
-                    curr->children[index] = create_patricia_node();
-                }
-                curr = curr->children[index];  
-            } else {
-                if (curr->children[index] == NULL) {
-                    curr->children[index] = create_patricia_node();
-                }
-                if (curr->children[index]->prefixes[EOE_INDEX] == NULL) {
-                    curr->children[index]->prefixes[EOE_INDEX] = strdup("\x01");
-                }
-                return;
-            }
+        if (prefix_len == (int)strlen(child->label)) {
+            rest += prefix_len;
+            curr = child;
             continue;
         }
 
-        // Cas 2b: match partiel, il faut diviser le noeud
+        
         PatriciaNode* new_node = create_patricia_node();
+        new_node->label = strdup(child->label + prefix_len);
 
-        int split_index = (unsigned char)prefix[prefix_len];
-        new_node->prefixes[split_index] = strdup(prefix + prefix_len);
-        new_node->children[split_index] = curr->children[index];
+        
+        char* old_label = child->label;
+        child->label = (char*)malloc(prefix_len + 1);
+        strncpy(child->label, old_label, prefix_len);
+        child->label[prefix_len] = '\0';
 
 
-        prefix[prefix_len] = '\0';
-        curr->children[index] = new_node;
+        for (int i = 0; i < ASCII_SIZE; i++) {
+            if (child->children[i] != NULL) {  
+                new_node->children[i] = child->children[i];
+                child->children[i] = NULL;
+            }
+        }
 
     
+        int child_index = (unsigned char)new_node->label[0];
+        child->children[child_index] = new_node;
+
+    
+        if (has_eoe_char(old_label)) {
+            child->children[EOE_INDEX] = create_patricia_node();
+            child->children[EOE_INDEX]->label = strdup("\x01");
+        }
+
+        free(old_label);
+
+        // Insert the rest of the word
+        curr->children[index] = child;
+        curr = child;
+
         size_t len = strlen(rest);
-        char* temp = malloc(len - prefix_len + 2);
+        char* temp = (char*)malloc(len - prefix_len + 2);  // +2 for EOE_CHAR and '\0'
         strcpy(temp, rest + prefix_len);
         temp[len - prefix_len] = EOE_CHAR;
         temp[len - prefix_len + 1] = '\0';
-        new_node->prefixes[(unsigned char)rest[prefix_len]] = temp;
+
+        curr->children[(unsigned char)rest[prefix_len]] = create_patricia_node();
+        curr->children[(unsigned char)rest[prefix_len]]->label = temp;
 
         return;
     }
-
-    // Cas 3: fin du mot
-    if (curr->children[EOE_INDEX] == NULL) {
-        curr->children[EOE_INDEX] = create_patricia_node();
-    }
-    if (curr->children[EOE_INDEX]->prefixes[EOE_INDEX] == NULL) {
-        curr->children[EOE_INDEX]->prefixes[EOE_INDEX] = strdup("\x01");
-    }
 }
+
+
 
 
 
@@ -134,263 +146,135 @@ int plus_long_pref(const char *s1, const char *s2) {
  * 
  * @param node 
  * @param word 
- * @return int 
- */
-int recherche_patricia(PatriciaNode* node, const char* word) {
-    PatriciaNode *curr = node;
-    const char *rest = word;
+ * @return bool
+  */
+bool recherche_patricia(PatriciaNode* node, const char* word) {
+    PatriciaNode* curr = node;
+    const char* rest = word;
 
     while (*rest) {
         int index = (unsigned char)(*rest);
-
-        // Cas 1: il n'y a pas de préfixe qui commence par le char
-        if (curr->prefixes[index] == NULL) {
-            return 0;
+        if (curr->children[index] == NULL) {
+            return false;
         }
 
-        char *prefix = curr->prefixes[index];
-        int prefix_len = plus_long_pref(prefix, rest);
-
-        // verifier la presence d'EOE char
-        int actual_prefix_len = strlen(prefix);
-        int has_eoe_char = (prefix[actual_prefix_len - 1] == EOE_CHAR) ? 1 : 0;
-        if (has_eoe_char) {
-            actual_prefix_len -= 1; 
+        PatriciaNode* child = curr->children[index];
+        int prefix_len = plus_long_pref(child->label, rest);
+        int label_len = (int)strlen(child->label);
+    
+        if(has_eoe_char(child->label) && prefix_len == (label_len-1)){
+            if(prefix_len == (int)strlen(rest)){
+                return true;
+            }
+            return false;
         }
-
-        // Cas où le préfixe correspond partiellement
-        if (prefix_len != actual_prefix_len) {
-            return 0;
+        
+        if(prefix_len < (int)strlen(child->label)){
+            return false;
         }
 
         rest += prefix_len;
-
-
-        if (*rest == '\0') {
-            // verifier la presence d'EOE char dans l'enfant
-            if (has_eoe_char || (curr->children[index]->prefixes[EOE_INDEX] != NULL)) {
-                return 1; 
+        if(*rest == '\0'){
+            if(has_eoe_char(child->label)){
+                return true;
             }
-            return 0; 
+            if(child->children[EOE_INDEX] != NULL){
+                return true;
+            }
+            return false;
         }
-
-    
-        if (curr->children[index] == NULL) {
-            return 0;
-        }
-
-        curr = curr->children[index];
+        curr = child;
     }
 
-    return 0;
+    return false;
 }
 
-
-void remove_eoe_char(char* s) {
+bool has_eoe_char(const char* s) {
     size_t len = strlen(s);
-    if (len > 0 && s[len - 1] == EOE_CHAR) {
-        s[len - 1] = '\0';
-    }
+    return (len > 0 && s[len - 1] == EOE_CHAR) ? true : false;
 }
-
-int estvide(PatriciaNode* node) {
-    for (int i = 0; i < ASCII_SIZE; i++) {
-        if (node->prefixes[i] != NULL || node->children[i] != NULL) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-char* string_concat(const char* s1, const char* s2) {
-    size_t len1 = strlen(s1);
-    size_t len2 = strlen(s2);
-    char* res = malloc(len1 + len2 + 1);
-    strcpy(res, s1);
-    strcat(res, s2);
-    return res;
-}
-
-void free_patricia_node(PatriciaNode* node) {
-    if (node == NULL) {
-        return;
-    }
-    for (int i = 0; i < ASCII_SIZE; i++) {
-        if (node->prefixes[i] != NULL) {
-            free(node->prefixes[i]);
-        }
-        if (node->children[i] != NULL) {
-            free_patricia_node(node->children[i]);
-        }
-    }
-    free(node);
-}
-
-int delete_word(PatriciaNode* node, const char* word){
-    PatriciaNode* curr = node;
-    const char* rest = word;
-    rest += strlen(word);
-    curr = curr->children[(unsigned char)*rest];
-    return 1;
-}
-
 
 int comptage_mots_patricia(PatriciaNode* node) {
-    int count = 0;
-    for (int i = 0; i < ASCII_SIZE; i++) {
-        if (node->prefixes[i] != NULL && has_eoe_char(node->prefixes[i])) {
-            count++;
-        }
-        if (node->children[i] != NULL) {
-            count += comptage_mots_patricia(node->children[i]);
-        }
-    }
-    return count;
-}
-
-int has_eoe_char(const char* s) {
-    size_t len = strlen(s);
-    return (len > 0 && s[len - 1] == EOE_CHAR) ? 1 : 0;
-}
-
-int comptage_nil_patricia(PatriciaNode* node) {
-    int count = 0;
-    for (int i = 0; i < ASCII_SIZE; i++) {
-        if (node->prefixes[i] == NULL) {
-            count++;
-        }
-        if (node->children[i] != NULL) {
-            count += comptage_nil_patricia(node->children[i]);
-        }
-    }
-    return count;
-}
-
-int max(int a, int b) {
-    return (a > b) ? a : b;
-}
-
-int hauteur_patricia(PatriciaNode* node) {
-    int height = 0;
-    for (int i = 0; i < ASCII_SIZE; i++) {
-        if (node->children[i] != NULL) {
-            height = max(height, hauteur_patricia(node->children[i]));
-        }
-    }
-    return height + 1;
-}
-
-int nb_prefixe_patricia(PatriciaNode* node, const char* word) {
-    if (node == NULL || *word == '\0') {
+    if (!node) {
         return 0;
     }
 
-    int index = (unsigned char)(*word);
+    int cpt = 0;
 
-    if (node->prefixes[index] == NULL) {
-    return 0;
-    }
-    int prefix = plus_long_pref(node->prefixes[index], word); 
-
-    if(est_prefixe(word, node->prefixes[index])){
-        if(has_eoe_char(node->prefixes[index])){
-            return 1;
-        }
-        else{
-            return comptage_mots_patricia(node->children[index]);
+    if (node->label != NULL && has_eoe_char(node->label)) {
+        cpt++; 
+    } else {
+        for (int i = 1; i < ASCII_SIZE; i++) {
+            if (node->children[i]) {
+                cpt += comptage_mots_patricia(node->children[i]);
+            }
         }
     }
-    if(prefix < (int)strlen(word) && prefix < (int)strlen(node->prefixes[index])){
+
+    return cpt;
+}
+
+int comptage_nul_patricia(PatriciaNode* node) {
+    if (!node) {
         return 0;
     }
 
-    if(prefix == (int)strlen(node->prefixes[index])){
-        if(node->children[index] == NULL){
-            return 0;
-        }
-        return nb_prefixe_patricia(node->children[index], word + prefix);
-    }
+    int cpt = 0;
 
-    return 0;
-}
-
-int est_prefixe(const char* s1, const char* s2){
-    int i = 0;
-    while(s1[i] && s2[i] && s1[i] == s2[i]){
-        i++;
-    }
-    return s1[i] == '\0';
-}
-
-
-
-char** liste_mots_patricia(PatriciaNode* node) {
-    static char* res[MAX_WORDS]; 
-    static int index = 0;  
-    index = 0; 
-
-    liste_mots_patricia_recursive(node, "", res, &index);
-
-    return res;
-}
-
-void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char** res, int* index) {
-    for (int i = 0; i < ASCII_SIZE; i++) {
-        if (node->prefixes[i] != NULL) {
-        
-            char new_prefix[MAX_WORD_LENGTH];
-            snprintf(new_prefix, MAX_WORD_LENGTH, "%s%s", prefix, node->prefixes[i]);
-
-        
-            if (has_eoe_char(node->prefixes[i])) {
-                res[*index] = strdup(new_prefix); 
-                (*index)++;
-            }
-
-            if (node->children[i] != NULL) {
-    
-                liste_mots_patricia_recursive(node->children[i], new_prefix, res, index);
+    if (node->label == NULL) {
+        cpt++;
+    } else {
+        for (int i = 1; i < ASCII_SIZE; i++) {
+            if (node->children[i]) {
+                cpt += comptage_nul_patricia(node->children[i]);
             }
         }
     }
+
+    return cpt;
 }
 
-void print_list_patricia(char** list, int size) {
-    printf("[ ");
-    for (int i = 0; i < size-1; i++) {
-        printf("%s, ", list[i]);
+int hauteur_patricia(PatriciaNode* node){
+    if(!node){
+        return 0;
     }
-    printf("%s ]\n", list[size-1]);
 
+    int max_height = 0;
+    for(int i = 1; i < ASCII_SIZE; i++){
+        if(node->children[i]){
+            int height = hauteur_patricia(node->children[i]);
+            if(height > max_height){
+                max_height = height;
+            }
+        }
+    }
+
+    return 1 + max_height;
 }
 
-int profondeur_moyenne_patricia_feuille(PatriciaNode* node){
+int profondeur_moyenne(PatriciaNode* node){
+    if(!node){
+        return 0;
+    }
+
     int sum = 0;
-    int nbFeuilles = 0;
+    int count = 0;
+    
+    profondeur_rec(node, 0, &sum, &count);
 
-    calcule_profondeur_moyenne_patricia_feuille(node, 0, &sum, &nbFeuilles);
-    if(nbFeuilles == 0){
-        return 0;
-    }
-    else {
-        return sum / nbFeuilles;
-    }
+    return (count > 0) ? sum / count : 0;
 }
 
-void calcule_profondeur_moyenne_patricia_feuille(PatriciaNode* node, int profondeur, int* sum, int* nbFeuilles){
-    if(estvide(node)){
+void profondeur_rec(PatriciaNode* node, int profondeur, int* sum, int* count){
+    if(!node){
         return;
     }
+    *sum += profondeur;
+    *count += 1;
 
-    for(int i = 0; i < ASCII_SIZE; i++){
-        if(node->prefixes[i] != NULL){
-            if(has_eoe_char(node->prefixes[i])){
-                *sum += profondeur + 1;
-                (*nbFeuilles)++;
-            }
-            else{
-                calcule_profondeur_moyenne_patricia_feuille(node->children[i], profondeur + 1, sum, nbFeuilles);
-            }
+    for(int i = 1; i < ASCII_SIZE; i++){
+        if(node->children[i]){
+            profondeur_rec(node->children[i], profondeur + 1, sum, count);
         }
     }
 }
