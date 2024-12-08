@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 /**
  * @private
@@ -412,13 +413,13 @@ int comptageNilTH(const TrieHybride *th)
     return comptageNilTH(th->inf) + comptageNilTH(th->eq) + comptageNilTH(th->sup);
 }
 
-size_t hauteurTH(const TrieHybride *th)
+ssize_t hauteurTH(const TrieHybride *th)
 {
-    if (!th || (!th->eq && determine_enfants(th) == AUCUNENF))
-        return 0;
-    size_t inf = hauteurTH(th->inf);
-    size_t eq = hauteurTH(th->eq);
-    size_t sup = hauteurTH(th->sup);
+    if (!th)
+        return -1;
+    ssize_t inf = hauteurTH(th->inf);
+    ssize_t eq = hauteurTH(th->eq);
+    ssize_t sup = hauteurTH(th->sup);
     return 1 + MAX3(inf, eq, sup);
 }
 
@@ -625,10 +626,14 @@ TrieHybride *fusionTH_rec(TrieHybride *restrict th1, const TrieHybride *restrict
 TrieHybride *fusionTH(TrieHybride **restrict th1, const TrieHybride *restrict th2)
 {
     assert(th1 && "Contract violated, null pointer passed in");
-    Stack s = newStack(hauteurTH(th2) + 1);
-    TrieHybride *th = fusionTH_rec(*th1, th2, &s);
-    assert(s.sz == 0 && "La pile des caractères doit être vide à cet instant");
-    freeStack(s);
+    TrieHybride *th = *th1;
+    if (th2)
+    {
+        Stack s = newStack(hauteurTH(th2) + 1);
+        th = fusionTH_rec(*th1, th2, &s);
+        assert(s.sz == 0 && "La pile des caractères doit être vide à cet instant");
+        freeStack(s);
+    }
     *th1 = NULL;
     return th;
 }

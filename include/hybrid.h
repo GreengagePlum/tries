@@ -13,6 +13,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <sys/types.h>
 
 /**
  * @def VALVIDE
@@ -196,7 +197,7 @@ int comptageNilTH(const TrieHybride *th);
  * @return Un entier non négatif indiquant la hauteur de l'arbre engandré par le trie
  *
  */
-size_t hauteurTH(const TrieHybride *th);
+ssize_t hauteurTH(const TrieHybride *th);
 
 /**
  * @brief Calcule la profondeur moyenne du Trie Hybride donné

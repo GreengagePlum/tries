@@ -2237,7 +2237,7 @@ void test_f_hauteurTH_1(void)
 {
     TrieHybride *th = newTH();
     TEST_ASSERT_NULL(th);
-    TEST_ASSERT_EQUAL(0, hauteurTH(th));
+    TEST_ASSERT_EQUAL(-1, hauteurTH(th));
     deleteTH(&th);
 }
 
