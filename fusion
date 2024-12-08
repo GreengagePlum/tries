@@ -1,3 +1,16 @@
 #!/usr/bin/env bash
 
-echo $0
+# Check if exactly two arguments are provided
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <x> <y>"
+    echo "x: A JSON file representing a Patricia-Trie tree"
+    echo "y: A JSON file representing a Patricia-Trie tree"
+    exit 1
+fi
+
+x=$1
+y=$2
+outfile="pat.json"
+
+# Run the program (always for Patricia-Trie)
+./tries 2 0 "$x" "$y" >"$outfile"
