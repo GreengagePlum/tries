@@ -9,11 +9,13 @@
  *
  */
 #define _DEFAULT_SOURCE 1
+#include "cJSON.h"
 #include "patricia.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
+#include <stdbool.h>
+#include <assert.h>
 
 
 /**
@@ -96,9 +98,6 @@ void insert_patricia(PatriciaNode* patricia, const char* word) {
         insert_patricia(patricia->children[index], word + prefix_commun);
     }
 }
-
-
-
 
 int plus_long_pref(const char *s1, const char *s2) {
     int i = 0;
@@ -337,8 +336,13 @@ void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char*
         if (node->prefixes[i] != NULL) {
         
             char new_prefix[MAX_WORD_LENGTH];
-            snprintf(new_prefix, MAX_WORD_LENGTH, "%s%s", prefix, node->prefixes[i]);
 
+            if(i != EOE_INDEX){
+                snprintf(new_prefix, MAX_WORD_LENGTH, "%s%s", prefix, node->prefixes[i]);
+            }
+            else{
+                snprintf(new_prefix, MAX_WORD_LENGTH, "%s%c", prefix, '\0');
+            }
         
             if (node->children[i] == NULL || node->prefixes[EOE_CHAR] != NULL) {
                 res[*index] = strdup(new_prefix); 
@@ -487,4 +491,75 @@ PatriciaNode* pat_fusion(PatriciaNode* node1, PatriciaNode* node2){
     }
     free(node2);
     return node1;
+}
+
+
+char *printJSONPatricia(const PatriciaNode *node)
+{
+    cJSON *js = constructJSONPT(node);
+    char *str = cJSON_Print(js);
+    cJSON_Delete(js);
+    return str;
+}
+
+cJSON *constructJSONPT(const PatriciaNode *node)
+{
+    if (!node)
+    {
+        cJSON *null = cJSON_CreateNull();
+        if (!null)
+        {
+            fprintf(stderr, "Erreur, cJSON_CreateNull dans constructJSONTH");
+            exit(1);
+        }
+        return null;
+    }
+
+    cJSON *obj = cJSON_CreateObject();
+    if (!obj)
+    {
+        fprintf(stderr, "Erreur, cJSON_CreateObject dans constructJSONPT");
+        exit(1);
+    }
+    if (!cJSON_AddStringToObject(obj, "label", ""))
+    {
+        fprintf(stderr, "Erreur, cJSON_AddStringToObject dans constructJSONPT");
+        exit(1);
+    }
+
+    bool is_end_of_word = false;
+    for (int i = 0; i < ASCII_SIZE; i++) {
+        if (node->children[i] == NULL || node->children[i]->prefixes[EOE_INDEX] != NULL) {
+            is_end_of_word = true;
+            break;
+        }
+    }
+
+    if (!cJSON_AddBoolToObject(obj, "is_end_of_word", is_end_of_word))
+    {
+        fprintf(stderr, "Erreur, cJSON_AddBoolToObject dans constructJSONPT");
+        exit(1);
+    }
+
+    
+    cJSON *children = cJSON_CreateObject();
+    for (int i = 0; i < ASCII_SIZE; i++)
+    {
+        if (node->prefixes[i] && node->children[i])  
+        {
+            cJSON *child_json = constructJSONPT(node->children[i]);
+            if (!cJSON_AddItemToObject(children, node->prefixes[i], child_json))  
+            {
+                fprintf(stderr, "Erreur, cJSON_AddItemToObject dans constructJSONpt");
+                exit(1);
+            }
+        }
+    }
+    if (!cJSON_AddItemToObject(obj, "children", children))
+    {
+        fprintf(stderr, "Erreur, cJSON_AddItemToObject dans constructJSONPT");
+        exit(1);
+    }
+
+    return obj;
 }

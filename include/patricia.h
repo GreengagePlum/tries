@@ -13,8 +13,9 @@
 #define ASCII_SIZE 128
 #define EOE_INDEX 0
 #define EOE_CHAR '\x01'
-#define MAX_WORDS 1000 
+#define MAX_WORDS 10000 
 #define MAX_WORD_LENGTH 100  
+#include "cJSON.h"
 
 typedef struct PatriciaNode{
     char *prefixes[ASCII_SIZE];
@@ -64,4 +65,8 @@ void calcule_profondeur_moyenne_patricia_feuille(PatriciaNode* node, int profond
 
 void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char** res, int* index);
 
+//CJSON
+
+cJSON *constructJSONPT(const PatriciaNode *node);
+char *printJSONPatricia(const PatriciaNode *node);
 #endif

@@ -49,7 +49,10 @@ void test_insert(void)
     TEST_ASSERT_EQUAL_STRING("t", node->prefixes[(unsigned char)'t']);
     TEST_ASSERT_EQUAL_STRING("est", node->children[(unsigned char)'t']->prefixes[(unsigned char)'e']);
     TEST_ASSERT_TRUE(5 == comptage_mots_patricia(node)); 
-    
+    char** liste = liste_mots_patricia(node);
+    print_list_patricia(liste, 5);
+    free_list_patricia(liste, 5);
+
     free_patricia_node(node);
 
   
@@ -111,6 +114,9 @@ void test_insert3(void){
     TEST_ASSERT_TRUE(1 == nb_prefixe_patricia(node, "them"));
     TEST_ASSERT_TRUE(2 == nb_prefixe_patricia(node, "appl"));
 
+    char** liste = liste_mots_patricia(node);
+    print_list_patricia(liste, 9);
+    free_list_patricia(liste, 9);
 
     TEST_ASSERT_EQUAL_STRING(" ", node->children[(unsigned char)'a']->prefixes[EOE_INDEX]);
     int i = delete_word(node, "app");
@@ -166,7 +172,10 @@ void test_fusion(void){
     }
     result = pat_fusion(stress1, stress2);
     TEST_ASSERT_TRUE(2000 == comptage_mots_patricia(result));
-
+    char** liste = liste_mots_patricia(node);
+    print_list_patricia(liste, 2000);
+    free_list_patricia(liste, 2000);
+    ;
     for(int i = 0; i < 1000; i++){
         char word[50];
         sprintf(word, "word%d", i);
