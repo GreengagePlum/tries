@@ -37,25 +37,21 @@ void test_insert(void)
     TEST_ASSERT_TRUE(2 == hauteur_patricia(node));
     TEST_ASSERT_TRUE(2 == comptage_mots_patricia(node));
 
-
     PatriciaNode *node2 = create_patricia_node();
     insert_patricia(node2, "apple");
     insert_patricia(node2, "application");
     insert_patricia(node2, "appetizer");
 
-
-   
     node = pat_fusion(node, node2);
     TEST_ASSERT_EQUAL_STRING("t", node->prefixes[(unsigned char)'t']);
     TEST_ASSERT_EQUAL_STRING("est", node->children[(unsigned char)'t']->prefixes[(unsigned char)'e']);
-    TEST_ASSERT_TRUE(5 == comptage_mots_patricia(node)); 
-    
-    free_patricia_node(node);
+    TEST_ASSERT_TRUE(5 == comptage_mots_patricia(node));
 
-  
+    free_patricia_node(node);
 }
 
-void test_insert2(void){
+void test_insert2(void)
+{
     PatriciaNode *node = create_patricia_node();
     insert_patricia(node, "the");
     insert_patricia(node, "they");
@@ -85,7 +81,8 @@ void test_insert2(void){
     free_patricia_node(node);
 }
 
-void test_insert3(void){
+void test_insert3(void)
+{
     PatriciaNode *node = create_patricia_node();
     insert_patricia(node, "they");
     insert_patricia(node, "the");
@@ -94,14 +91,16 @@ void test_insert3(void){
     insert_patricia(node, "there");
     TEST_ASSERT_EQUAL_STRING("t", node->prefixes[(unsigned char)'t']);
     TEST_ASSERT_TRUE(5 == comptage_mots_patricia(node));
-    insert_patricia(node, "apple"); 
+    insert_patricia(node, "apple");
     insert_patricia(node, "application");
     insert_patricia(node, "appetizer");
-    TEST_ASSERT_EQUAL_STRING("app", node->prefixes[(unsigned char)'a']); 
+    TEST_ASSERT_EQUAL_STRING("app", node->prefixes[(unsigned char)'a']);
     TEST_ASSERT_EQUAL_STRING("l", node->children[(unsigned char)'a']->prefixes[(unsigned char)'l']);
-    TEST_ASSERT_EQUAL_STRING("ication", node->children[(unsigned char)'a']->children[(unsigned char)'l']->prefixes[(unsigned char)'i']);
+    TEST_ASSERT_EQUAL_STRING(
+        "ication", node->children[(unsigned char)'a']->children[(unsigned char)'l']->prefixes[(unsigned char)'i']);
     TEST_ASSERT_EQUAL_STRING("etizer", node->children[(unsigned char)'a']->prefixes[(unsigned char)'e']);
-    TEST_ASSERT_EQUAL_STRING("e", node->children[(unsigned char)'a']->children[(unsigned char)'l']->prefixes[(unsigned char)'e']);
+    TEST_ASSERT_EQUAL_STRING(
+        "e", node->children[(unsigned char)'a']->children[(unsigned char)'l']->prefixes[(unsigned char)'e']);
     TEST_ASSERT_TRUE(8 == comptage_mots_patricia(node));
     insert_patricia(node, "app");
     TEST_ASSERT_TRUE(9 == comptage_mots_patricia(node));
@@ -111,7 +110,6 @@ void test_insert3(void){
     TEST_ASSERT_TRUE(1 == nb_prefixe_patricia(node, "them"));
     TEST_ASSERT_TRUE(2 == nb_prefixe_patricia(node, "appl"));
 
-
     TEST_ASSERT_EQUAL_STRING(" ", node->children[(unsigned char)'a']->prefixes[EOE_INDEX]);
     int i = delete_word(node, "app");
     TEST_ASSERT_TRUE(1 == i);
@@ -120,18 +118,18 @@ void test_insert3(void){
     TEST_ASSERT_TRUE(7 == comptage_mots_patricia(node));
     TEST_ASSERT_EQUAL_STRING("appl", node->prefixes[(unsigned char)'a']);
 
-    free_patricia_node(node);}
-
-
-
-
-void test_suffixe(void){
-    const char* s1 = "pref";
-    const char* s2 = "prefix";
-    TEST_ASSERT_EQUAL_STRING("ix", suffixe(s1,s2));
+    free_patricia_node(node);
 }
 
-void test_fusion(void){
+void test_suffixe(void)
+{
+    const char *s1 = "pref";
+    const char *s2 = "prefix";
+    TEST_ASSERT_EQUAL_STRING("ix", suffixe(s1, s2));
+}
+
+void test_fusion(void)
+{
     PatriciaNode *node = create_patricia_node();
     insert_patricia(node, "the");
     insert_patricia(node, "they");
@@ -157,7 +155,8 @@ void test_fusion(void){
 
     PatriciaNode *stress1 = create_patricia_node();
     PatriciaNode *stress2 = create_patricia_node();
-    for(int i = 0; i < 1000; i++){
+    for (int i = 0; i < 1000; i++)
+    {
         char word[50];
         sprintf(word, "word%d", i);
         insert_patricia(stress1, word);
@@ -167,27 +166,26 @@ void test_fusion(void){
     result = pat_fusion(stress1, stress2);
     TEST_ASSERT_TRUE(2000 == comptage_mots_patricia(result));
 
-    for(int i = 0; i < 1000; i++){
+    for (int i = 0; i < 1000; i++)
+    {
         char word[50];
         sprintf(word, "word%d", i);
         delete_word(result, word);
     }
     free_patricia_node(result);
-    }
-
+}
 
 int main(void)
 {
     UNITY_BEGIN();
-  
+
     RUN_TEST(test_create);
     RUN_TEST(test_insert);
     RUN_TEST(test_insert2);
     RUN_TEST(test_insert3);
     RUN_TEST(test_fusion);
-    
+
     RUN_TEST(test_suffixe);
 
-        
     return UNITY_END();
 }

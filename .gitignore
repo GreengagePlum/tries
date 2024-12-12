@@ -24,3 +24,9 @@ doc/public/
 .vscode/
 compile_flags.txt
 vgcore.*
+test_exit_stat.tmp
+trie.json
+pat.json
+mot.txt
+profondeur.txt
+prefixe.txt
