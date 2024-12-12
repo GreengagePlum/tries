@@ -264,7 +264,7 @@ char *printJSONTH(const TrieHybride *th);
 TrieHybride *parseJSONTH(const char *json, size_t sz);
 
 /**
- * @brief Fusionne deux Tries Hybrides donnés
+ * @brief Fusionne deux Tries Hybrides donnés (semi "in place")
  *
  * @param [in,out] th1 Un pointeur de pointeur vers le Trie Hybride à fusionner
  * @param [in] th2 Un pointeur vers le Trie Hybride à fusionner
@@ -286,7 +286,7 @@ TrieHybride *parseJSONTH(const char *json, size_t sz);
 TrieHybride *fusionTH(TrieHybride **restrict th1, const TrieHybride *restrict th2);
 
 /**
- * @brief Fusionne deux Tries Hybrides donnés
+ * @brief Fusionne deux Tries Hybrides donnés (par recopie)
  *
  * @param [in] th1 Un pointeur vers le Trie Hybride à fusionner
  * @param [in] th2 Un pointeur vers le Trie Hybride à fusionner
