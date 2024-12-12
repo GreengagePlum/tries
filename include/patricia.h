@@ -21,23 +21,47 @@ typedef struct PatriciaNode{
     struct PatriciaNode *children[ASCII_SIZE];
 } PatriciaNode;
 
-PatriciaNode *create_patricia_node();
-void insert_patricia(PatriciaNode *root, const char *mot);
+//FONCTION AUXILIAIRES
+
+const char* suffixe(const char* s1, const char* s2);
 int plus_long_pref(const char *s1, const char *s2);
-int recherche_patricia(PatriciaNode* patricia, const char* word);
+int est_prefixe(const char* s1, const char* s2);
 void free_patricia_node(PatriciaNode* node);
 void remove_eoe_char(char* s);
-int delete_word(PatriciaNode* node, const char* word);
-int comptage_mots_patricia(PatriciaNode* node);
 int has_eoe_char(const char* s);
-int comptage_nil_patricia(PatriciaNode* node);
-int hauteur_patricia(PatriciaNode* node);
-int nb_prefixe_patricia(PatriciaNode* node, const char* word);
-int est_prefixe(const char* s1, const char* s2);
 int max(int a, int b);
-char** liste_mots_patricia(PatriciaNode* node);
-void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char** res, int* index);
 void print_list_patricia(char** liste, int size);
-void calcule_profondeur_moyenne_patricia_feuille(PatriciaNode* node, int profondeur, int* sum, int* nbFeuilles);
+void print_patricia(PatriciaNode* node, int depth);
+void prefixe_fusion(const char* s1, const char* s2, char* x, char* y, char* z);
+PatriciaNode* pat_cons(PatriciaNode* node, const char* word);
+void free_list_patricia(char** list, int size);
+
+//FONCTIONS PRINCIPALES
+PatriciaNode *create_patricia_node();
+
+void insert_patricia(PatriciaNode *root, const char *mot);
+
+int recherche_patricia(PatriciaNode* patricia, const char* word);
+
+int nb_prefixe_patricia(PatriciaNode* node, const char* word);
+
+int delete_word(PatriciaNode* node, const char* word);
+
+int comptage_mots_patricia(PatriciaNode* node);
+
+int comptage_nil_patricia(PatriciaNode* node);
+
+int hauteur_patricia(PatriciaNode* node);
+
+char** liste_mots_patricia(PatriciaNode* node);
+
 int profondeur_moyenne_patricia_feuille(PatriciaNode* node);
+
+PatriciaNode* pat_fusion(PatriciaNode* node1, PatriciaNode* node2);
+
+//HELPERS RECURSIVES
+void calcule_profondeur_moyenne_patricia_feuille(PatriciaNode* node, int profondeur, int* sum, int* nbFeuilles);
+
+void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char** res, int* index);
+
 #endif
