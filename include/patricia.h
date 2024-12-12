@@ -13,8 +13,8 @@
 #define ASCII_SIZE 128
 #define EOE_INDEX 0
 #define EOE_CHAR '\x01'
-#define MAX_WORDS 1000 
-#define MAX_WORD_LENGTH 100  
+#define MAX_WORDS 1000
+#define MAX_WORD_LENGTH 100
 
 typedef struct PatriciaNode{
     char *prefixes[ASCII_SIZE];
@@ -37,7 +37,7 @@ PatriciaNode* pat_cons(PatriciaNode* node, const char* word);
 void free_list_patricia(char** list, int size);
 
 //FONCTIONS PRINCIPALES
-PatriciaNode *create_patricia_node();
+PatriciaNode *create_patricia_node(void);
 
 void insert_patricia(PatriciaNode *root, const char *mot);
 
