@@ -20,10 +20,10 @@
 
 /**
  * @brief Fonction qui crée un nouveau noeud Patricia
- * 
- * @return PatriciaNode* 
+ *
+ * @return PatriciaNode*
  */
-PatriciaNode *create_patricia_node(){
+PatriciaNode *create_patricia_node(void){
     PatriciaNode *node = (PatriciaNode *)malloc(sizeof(PatriciaNode));
     if(node == NULL){
         fprintf(stderr, "Erreur d'allocation de mémoire: create_patricia_node\n");
@@ -47,9 +47,9 @@ const char* suffixe(const char* s1, const char* s2){
 
 /**
  * @brief Fonction qui insère un mot dans le Patricia-Trie
- * 
- * @param root 
- * @param word 
+ *
+ * @param root
+ * @param word
  */
 void insert_patricia(PatriciaNode* patricia, const char* word) {
     if (*word == '\0') {
@@ -83,14 +83,14 @@ void insert_patricia(PatriciaNode* patricia, const char* word) {
         char* copy = strndup(patricia->prefixes[index], prefix_commun);
         char* copy2 = strdup(patricia->prefixes[index] + prefix_commun);
 
-        
+
         PatriciaNode* new_child = create_patricia_node();
 
         new_child->prefixes[(unsigned char)(*copy2)] = copy2;
         new_child->children[(unsigned char)(*copy2)] = patricia->children[index];
         patricia->children[index] = new_child;
 
-       
+
 
         free(patricia->prefixes[index]);
         patricia->prefixes[index] = copy;
@@ -108,10 +108,10 @@ int plus_long_pref(const char *s1, const char *s2) {
 
 /**
  * @brief Fonction qui recherche un mot dans le Patricia-Trie
- * 
- * @param node 
- * @param word 
- * @return int 
+ *
+ * @param node
+ * @param word
+ * @return int
  */
 int recherche_patricia(PatriciaNode* node, const char* word) {
     if (node == NULL) {
@@ -291,7 +291,7 @@ int nb_prefixe_patricia(PatriciaNode* node, const char* word) {
     if (node->prefixes[index] == NULL) {
     return 0;
     }
-    int prefix = plus_long_pref(node->prefixes[index], word); 
+    int prefix = plus_long_pref(node->prefixes[index], word);
 
     if(est_prefixe(word, node->prefixes[index])){
         if(node->children[index] == NULL){
@@ -322,9 +322,9 @@ int est_prefixe(const char* s1, const char* s2){
 
 
 char** liste_mots_patricia(PatriciaNode* node) {
-    static char* res[MAX_WORDS]; 
-    static int index = 0;  
-    index = 0; 
+    static char* res[MAX_WORDS];
+    static int index = 0;
+    index = 0;
 
     liste_mots_patricia_recursive(node, "", res, &index);
 
@@ -334,7 +334,7 @@ char** liste_mots_patricia(PatriciaNode* node) {
 void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char** res, int* index) {
     for (int i = 0; i < ASCII_SIZE; i++) {
         if (node->prefixes[i] != NULL) {
-        
+
             char new_prefix[MAX_WORD_LENGTH];
 
             if(i != EOE_INDEX){
@@ -345,12 +345,12 @@ void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char*
             }
         
             if (node->children[i] == NULL || node->prefixes[EOE_CHAR] != NULL) {
-                res[*index] = strdup(new_prefix); 
+                res[*index] = strdup(new_prefix);
                 (*index)++;
             }
 
             if (node->children[i] != NULL) {
-    
+
                 liste_mots_patricia_recursive(node->children[i], new_prefix, res, index);
             }
         }
@@ -423,7 +423,7 @@ void calcule_profondeur_moyenne_patricia_feuille(PatriciaNode* node, int profond
 
 void prefixe_fusion(const char* s1, const char* s2, char* x, char* y, char* z){
     int prefix_len = plus_long_pref(s1, s2);
-    
+
     strncpy(x, s1, prefix_len);
     x[prefix_len] = '\0';
     strcpy(y, s1 + prefix_len);
@@ -452,8 +452,8 @@ PatriciaNode* pat_fusion(PatriciaNode* node1, PatriciaNode* node2){
 
     for(int i = 0; i < ASCII_SIZE; i++){
         if(node1->prefixes[i] == NULL && node2->prefixes[i] != NULL){
-            
-           
+
+
            node1->prefixes[i] = strdup(node2->prefixes[i]);
            free(node2->prefixes[i]);
            node2->prefixes[i] = NULL;
@@ -462,7 +462,7 @@ PatriciaNode* pat_fusion(PatriciaNode* node1, PatriciaNode* node2){
         }
         else if(node2->prefixes[i] != NULL){
            if(strcmp(node1->prefixes[i], node2->prefixes[i]) == 0){
-                free(node2->prefixes[i]);  
+                free(node2->prefixes[i]);
                 node1->children[i] = pat_fusion(node1->children[i], node2->children[i]);
                 //free_patricia_node(node2->children[i]);
            }

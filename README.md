@@ -4,7 +4,7 @@
 <a href="https://github.com/GreengagePlum/tries/actions/workflows/test.yml"><img alt="test workflow status" src="https://github.com/GreengagePlum/tries/actions/workflows/test.yml/badge.svg"/></a>
 <a href="https://github.com/GreengagePlum/tries/actions/workflows/deploy.yml"><img alt="deploy workflow status" src="https://github.com/GreengagePlum/tries/actions/workflows/deploy.yml/badge.svg"/></a>
 
-Here is a programming project in C that aims to implement the Patricia-Trie and the Hybrid Trie. The trie is a data structure that is used to represent a dictionary of words.
+Here is a programming project in **C (ISO C17)** that aims to implement the Patricia-Trie and the Hybrid Trie. The trie is a data structure that is used to represent a dictionary of words.
 
 This project uses the [Unity](https://github.com/ThrowTheSwitch/Unity.git) unit test framework for C as well as
 [cJSON](https://github.com/DaveGamble/cJSON.git) for the handling of JSON. These dependencies are integrated to the
@@ -25,7 +25,7 @@ This programming project was carried out for the ALGAV (Advanced Algorithmics) c
 
 ## gcc/clang versions
 
-"GNU gcc" and "Apple clang" are used as compilers. Right below are the versions of these compilers that were used:
+The C language is used (ISO C17). "GNU gcc" and "Apple clang" are used as compilers. Right below are the versions of these compilers that were used:
 
 ```text
 Apple clang version 16.0.0 (clang-1600.0.26.3)

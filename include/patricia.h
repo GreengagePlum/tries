@@ -38,7 +38,7 @@ PatriciaNode* pat_cons(PatriciaNode* node, const char* word);
 void free_list_patricia(char** list, int size);
 
 //FONCTIONS PRINCIPALES
-PatriciaNode *create_patricia_node();
+PatriciaNode *create_patricia_node(void);
 
 void insert_patricia(PatriciaNode *root, const char *mot);
 

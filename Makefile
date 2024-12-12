@@ -23,9 +23,19 @@ EXEC = tries
 
 ##### Options
 CPPFLAGS =
-CFLAGS = -Wall -Wextra -Werror -std=iso9899:2018 -pedantic -march=native -O3 -I$(HPATH) -I$(JPATH) -I$(UPATH)
+CFLAGS = -Wall -Wextra -Werror -std=iso9899:2018 -pedantic -I$(HPATH) -I$(JPATH) -I$(UPATH)
 LDFLAGS =
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DPATH)$*.Td
+
+# Use `make DEBUG=0` (or nothing) and `make DEBUG=1` to switch
+DEBUG ?= 0
+ifeq ($(DEBUG), 1)
+	CPPFLAGS += -DDEBUG
+	CFLAGS += -g
+else
+	CPPFLAGS += -DNDEBUG
+	CFLAGS += -march=native -O3
+endif
 
 ##### Files
 SRC = $(wildcard $(SPATH)*.c)
@@ -41,6 +51,8 @@ PASSED = `grep -s PASS $(RPATH)*.txt`
 FAIL = `grep -s FAIL $(RPATH)*.txt`
 IGNORE = `grep -s IGNORE $(RPATH)*.txt`
 
+EXIT_STAT_TMP_FILE = $(RPATH)test_exit_stat.tmp
+
 ##### Documentation generation
 DOCGEN = doxygen
 DOXYFILE = doc/Doxyfile
@@ -51,12 +63,12 @@ DOCPATH = doc/public/
 POSTCOMPILE = mv -f $(DPATH)$*.Td $(DPATH)$*.d && touch $@
 
 ##### Build rules
-.PHONY: all test doc clean cleandoc cleanall
-
-all: $(EXEC) test
+.PHONY: all test doc clean cleandoc cleanall FORCE
 
 $(EXEC): $(OBJ) $(OPATH)cJSON.o
 	$(CC) -o $@ $^ $(LDFLAGS)
+
+all: $(EXEC) test
 
 $(OPATH)%.o:: $(SPATH)%.c $(DPATH)%.d | $(OPATH) $(DPATH)
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -o $@ $<
@@ -80,11 +92,12 @@ test: $(BUILD_PATHS) $(RESULTS)
 	@echo "-----------------------\nPASSED:\n-----------------------"
 	@echo "$(PASSED)"
 	@echo "\nDONE"
+	@[ -s $(EXIT_STAT_TMP_FILE) ] && VAL=$$(cat $(EXIT_STAT_TMP_FILE)) || VAL=0; rm -f $(EXIT_STAT_TMP_FILE); exit $$VAL
 
-$(RPATH)%.txt: $(BPATH)%
-	-./$< > $@ 2>&1
+$(RPATH)%.txt: $(BPATH)% FORCE
+	-./$< > $@ 2>&1 || echo $$? > $(EXIT_STAT_TMP_FILE)
 
-$(BPATH)Test%: $(OPATH)Test%.o $(OPATH)%.o $(OPATH)unity.o
+$(BPATH)Test%: $(OPATH)Test%.o $(OPATH)%.o $(OPATH)unity.o $(OPATH)cJSON.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 $(OPATH):
@@ -99,12 +112,14 @@ $(RPATH):
 $(BPATH):
 	mkdir -p $@
 
+FORCE:
+
 $(DEP):
 
 -include $(DEP)
 
 clean:
-	rm -f $(EXEC) $(OBJ) $(DEP) $(RESULTS)
+	rm -f $(EXEC) $(OBJ) $(DEP) $(RESULTS) $(EXIT_STAT_TMP_FILE)
 
 cleandoc:
 	rm -rf $(DOCPATH)
