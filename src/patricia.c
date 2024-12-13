@@ -502,64 +502,70 @@ char *printJSONPatricia(const PatriciaNode *node)
     return str;
 }
 
-cJSON *constructJSONPT(const PatriciaNode *node)
-{
-    if (!node)
-    {
-        cJSON *null = cJSON_CreateNull();
-        if (!null)
-        {
-            fprintf(stderr, "Erreur, cJSON_CreateNull dans constructJSONTH");
-            exit(1);
-        }
-        return null;
-    }
-
+cJSON *constructJSONPT_helper(const PatriciaNode *node, int i) {
     cJSON *obj = cJSON_CreateObject();
-    if (!obj)
-    {
-        fprintf(stderr, "Erreur, cJSON_CreateObject dans constructJSONPT");
-        exit(1);
-    }
-    if (!cJSON_AddStringToObject(obj, "label", ""))
-    {
-        fprintf(stderr, "Erreur, cJSON_AddStringToObject dans constructJSONPT");
-        exit(1);
-    }
-
+    const char* label = node->prefixes[i];
+    cJSON_AddStringToObject(obj, "label", label);
     bool is_end_of_word = false;
-    for (int i = 0; i < ASCII_SIZE; i++) {
-        if (node->children[i] == NULL || node->children[i]->prefixes[EOE_INDEX] != NULL) {
-            is_end_of_word = true;
-            break;
-        }
-    }
+    int flag = 0;
 
-    if (!cJSON_AddBoolToObject(obj, "is_end_of_word", is_end_of_word))
-    {
-        fprintf(stderr, "Erreur, cJSON_AddBoolToObject dans constructJSONPT");
-        exit(1);
+    cJSON *children = cJSON_CreateObject();
+
+    for(int i = 0; i < ASCII_SIZE; i++){
+        if(i == EOE_INDEX){
+            continue;
+        }
+        else
+        if(node->prefixes[i] != NULL){
+            cJSON *child = constructJSONPT_helper(node->children[i], i);
+            cJSON_AddItemToObject(children,node->prefixes[i], child);
+            flag = 1;
+        }
     }
 
     
+
+    if(flag == 0){
+        is_end_of_word = true;
+    }
+    cJSON_AddBoolToObject(obj, "is_end_of_word", is_end_of_word);
+    cJSON_AddItemToObject(obj, "children", children);
+    return obj;
+}
+
+cJSON *constructJSONPT(const PatriciaNode *node) {
+    cJSON *obj = cJSON_CreateObject();
+    const char* label = "";
+    cJSON_AddStringToObject(obj, "label", label);
+    bool is_end_of_word = false;
+    int flag = 0;
+
     cJSON *children = cJSON_CreateObject();
-    for (int i = 0; i < ASCII_SIZE; i++)
-    {
-        if (node->prefixes[i] && node->children[i])  
-        {
-            cJSON *child_json = constructJSONPT(node->children[i]);
-            if (!cJSON_AddItemToObject(children, node->prefixes[i], child_json))  
-            {
-                fprintf(stderr, "Erreur, cJSON_AddItemToObject dans constructJSONpt");
-                exit(1);
-            }
+    
+    for(int i = 0; i < ASCII_SIZE; i++){
+        if(i == EOE_INDEX){
+            continue;
+        }
+        else
+        if(node->prefixes[i] != NULL){
+            cJSON *child = constructJSONPT_helper(node, i);
+            cJSON_AddItemToObject(children,node->prefixes[i], child);
+            flag = 1;
         }
     }
-    if (!cJSON_AddItemToObject(obj, "children", children))
-    {
-        fprintf(stderr, "Erreur, cJSON_AddItemToObject dans constructJSONPT");
-        exit(1);
-    }
 
+   
+
+    if(flag == 0){
+        is_end_of_word = true;
+    }
+    cJSON_AddBoolToObject(obj, "is_end_of_word", is_end_of_word);
+    cJSON_AddItemToObject(obj, "children", children);
     return obj;
+}
+
+PatriciaNode *parseJSONPT(const char *json, size_t sz){
+   json++;
+   sz++;
+   return NULL; 
 }

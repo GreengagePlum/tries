@@ -16,6 +16,7 @@
 #define MAX_WORDS 10000 
 #define MAX_WORD_LENGTH 100  
 #include "cJSON.h"
+#include <stdbool.h>
 
 typedef struct PatriciaNode{
     char *prefixes[ASCII_SIZE];
@@ -69,4 +70,6 @@ void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char*
 
 cJSON *constructJSONPT(const PatriciaNode *node);
 char *printJSONPatricia(const PatriciaNode *node);
+cJSON *constructJSONPT_helper(const PatriciaNode *node, const char *prefix);
+PatriciaNode *parseJSONPT(const char *json, size_t sz);
 #endif
