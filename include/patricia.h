@@ -13,8 +13,8 @@
 #define ASCII_SIZE 128
 #define EOE_INDEX 0
 #define EOE_CHAR '\x01'
-#define MAX_WORDS 10000 
-#define MAX_WORD_LENGTH 100  
+#define MAX_WORDS 10000
+#define MAX_WORD_LENGTH 100
 #include "cJSON.h"
 #include <stdbool.h>
 
@@ -68,8 +68,8 @@ void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char*
 
 //CJSON
 
-cJSON *constructJSONPT(const PatriciaNode *node);
-char *printJSONPatricia(const PatriciaNode *node);
-cJSON *constructJSONPT_helper(const PatriciaNode *node, const char *prefix);
+cJSON *constructJSONPT(const PatriciaNode *node, const char *label);
+char *printJSONPT(const PatriciaNode *node);
+PatriciaNode *parseJSONPT_rec(const cJSON *json);
 PatriciaNode *parseJSONPT(const char *json, size_t sz);
 #endif

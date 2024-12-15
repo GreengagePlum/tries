@@ -1,6 +1,5 @@
 #include "patricia.h"
 #include "unity.h"
-#include "cJSON.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -35,7 +34,7 @@ void test_insert(void)
     TEST_ASSERT_NULL(node->children[(unsigned char)'t']->children[(unsigned char)'e']);
 
 
-    char *json = printJSONPatricia(node);
+    char *json = printJSONPT(node);
     printf("%s\n", json);
 
     TEST_ASSERT_TRUE(1 == recherche_patricia(node, "test"));
@@ -54,7 +53,7 @@ void test_insert(void)
     TEST_ASSERT_EQUAL_STRING("est", node->children[(unsigned char)'t']->prefixes[(unsigned char)'e']);
     TEST_ASSERT_TRUE(5 == comptage_mots_patricia(node));
 
-    TEST_ASSERT_TRUE(5 == comptage_mots_patricia(node)); 
+    TEST_ASSERT_TRUE(5 == comptage_mots_patricia(node));
     char** liste = liste_mots_patricia(node);
     print_list_patricia(liste, 5);
     free_list_patricia(liste, 5);
@@ -117,7 +116,7 @@ void test_insert3(void)
     insert_patricia(node, "app");
     TEST_ASSERT_TRUE(9 == comptage_mots_patricia(node));
 
-    
+
     TEST_ASSERT_TRUE(4 == nb_prefixe_patricia(node, "th"));
     TEST_ASSERT_TRUE(4 == nb_prefixe_patricia(node, "the"));
     TEST_ASSERT_TRUE(1 == nb_prefixe_patricia(node, "them"));

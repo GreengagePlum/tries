@@ -35,7 +35,7 @@ void insererPT(void)
         exit(1);
     }
     free(s);
-    char *json = printJSONPatricia(pt);
+    char *json = printJSONPT(pt);
     printf("%s", json);
     free(json);
     free_patricia_node(pt);
@@ -153,7 +153,7 @@ void suppressionPT(const char *path)
         if(i == 0){
             fprintf(stderr, "Erreur, delete_word dans suppressionPT");
             exit(1);
-        
+
         }
     }
     if (sz == -1 && ferror(stdin))
@@ -161,7 +161,7 @@ void suppressionPT(const char *path)
         fprintf(stderr, "Erreur, getline dans suppressionPT");
         exit(1);
     }
-    
+
     free(s);
     rewind(f);
     if (ftruncate(fileno(f), 0) == -1)
@@ -169,7 +169,7 @@ void suppressionPT(const char *path)
         perror("Erreur, ftruncate dans suppressionPT");
         exit(1);
     }
-    s = printJSONPatricia(pt);
+    s = printJSONPT(pt);
     fprintf(f, "%s", s);
 
     if (fclose(f) == EOF)
@@ -254,7 +254,7 @@ void fusionMainPT(const char *path1, const char *path2)
     free(s);
 
     pt1 = pat_fusion(pt1, pt2);
-    s = printJSONPatricia(pt1);
+    s = printJSONPT(pt1);
     printf("%s", s);
     free(s);
 
