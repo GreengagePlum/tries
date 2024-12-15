@@ -551,9 +551,70 @@ char *printJSONPT(const PatriciaNode *node)
     return res;
 }
 
-PatriciaNode *parseJSONPT_rec(const cJSON *json) {
-    (void)json;
-    return NULL;
+bool parseJSONPT_hasChildren(const cJSON *json)
+{
+    int count = 0;
+    const cJSON *elem;
+    cJSON_ArrayForEach(elem, json)
+    {
+        count++;
+    }
+    return !!count;
+}
+
+PatriciaNode *parseJSONPT_rec(const cJSON *json, char **label)
+{
+    const cJSON *obj;
+
+    obj = cJSON_GetObjectItemCaseSensitive(json, "label");
+    assert(cJSON_IsString(obj) && "'label' element has to be a JSON string element");
+    *label = strdup(obj->valuestring);
+    if (!*label)
+    {
+        fprintf(stderr, "Erreur, strdup dans parseJSONPT_rec");
+        exit(1);
+    }
+
+    const cJSON *children;
+    children = cJSON_GetObjectItemCaseSensitive(json, "children");
+    assert(cJSON_IsObject(children) && "'children' element has to be a JSON object element");
+    bool hasChildren = parseJSONPT_hasChildren(children);
+    if (!hasChildren)
+        return NULL;
+
+    obj = cJSON_GetObjectItemCaseSensitive(json, "is_end_of_word");
+    assert(cJSON_IsBool(obj) && "'is_end_of_word' element has to be a JSON bool element");
+    bool isEnd = cJSON_IsTrue(obj);
+
+    PatriciaNode *node = create_patricia_node();
+    char *rec_label;
+    const cJSON *elem;
+    cJSON_ArrayForEach(elem, children)
+    {
+        unsigned char index = elem->string[0];
+        node->children[index] = parseJSONPT_rec(elem, &rec_label);
+        node->prefixes[index] = rec_label;
+    }
+
+    if (hasChildren)
+    {
+        if (isEnd)
+        {
+            char *end_str = strdup(" ");
+            if (!end_str)
+            {
+                fprintf(stderr, "Erreur, strdup dans parseJSONPT_rec");
+                exit(1);
+            }
+            node->prefixes[EOE_INDEX] = end_str;
+        }
+        else
+        {
+            node->prefixes[EOE_INDEX] = NULL;
+        }
+    }
+
+    return node;
 }
 
 PatriciaNode *parseJSONPT(const char *json, size_t sz)
@@ -569,7 +630,8 @@ PatriciaNode *parseJSONPT(const char *json, size_t sz)
         }
         exit(1);
     }
-    PatriciaNode *th = parseJSONPT_rec(obj);
+    char *label;
+    PatriciaNode *th = parseJSONPT_rec(obj, &label);
     cJSON_Delete(obj);
     return th;
 }

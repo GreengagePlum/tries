@@ -70,6 +70,6 @@ void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char*
 
 cJSON *constructJSONPT(const PatriciaNode *node, const char *label);
 char *printJSONPT(const PatriciaNode *node);
-PatriciaNode *parseJSONPT_rec(const cJSON *json);
+PatriciaNode *parseJSONPT_rec(const cJSON *json, char **label);
 PatriciaNode *parseJSONPT(const char *json, size_t sz);
 #endif
