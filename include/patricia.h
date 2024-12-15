@@ -13,7 +13,7 @@
 #define ASCII_SIZE 128
 #define EOE_INDEX 0
 #define EOE_CHAR '\x01'
-#define MAX_WORDS 10000
+#define MAX_WORDS 1##000##000L
 #define MAX_WORD_LENGTH 100
 #include "cJSON.h"
 #include <stdbool.h>

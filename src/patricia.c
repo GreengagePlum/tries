@@ -632,6 +632,7 @@ PatriciaNode *parseJSONPT(const char *json, size_t sz)
     }
     char *label;
     PatriciaNode *th = parseJSONPT_rec(obj, &label);
+    free(label);
     cJSON_Delete(obj);
     return th;
 }

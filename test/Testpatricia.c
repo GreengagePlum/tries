@@ -59,6 +59,7 @@ void test_insert(void)
     free_list_patricia(liste, 5);
 
     free_patricia_node(node);
+    free(json);
 }
 
 void test_insert2(void)
