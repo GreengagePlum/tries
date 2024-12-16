@@ -51,13 +51,16 @@ cd tries/
 make
 ```
 
-From now on you can execute the file so long as you're in its directory.
+From now on you can run the program via its interface scripts so long as you're in its directory.
 
 ```sh
-./tries
+./inserer [0 | 1] [file]
+./suppression [0 | 1] [file]
+./fusionPat [file] [file]
+./listeMots [0 | 1] [file]
+./profondeurMoyenne [0 | 1] [file]
+./prefixe [0 | 1] [file] [word]
 ```
-
-_Under construction..._
 
 ### Generate the documentation
 
@@ -77,6 +80,10 @@ Or else, you could see the [online documentation](https://greengageplum.github.i
 make test
 ```
 
+You can also use `make all` to both compile the final executable and compile and run the unit tests like `make test`.
+It's a handy shortcut to running both operations at once to check that the changes you have introduced don't break
+neither the program compilation nor the unit tests.
+
 ### How to clean?
 
 To clean the project directory to start from zero there are multiple useful commands.
@@ -93,11 +100,19 @@ Remove the documentation and its directories
 make cleandoc
 ```
 
-This is a command that groups together all that came before. It removes all the compilation, documentation and archive files and directories.
+This is a command that groups together all that came before. It removes all the compilation, documentation and archive files as well as all directories.
 
 ```sh
 make cleanall
 ```
+
+### How to switch between debug and release builds?
+
+To build the debug version (`-g` compiler option for debugger and assertions enabled), all you have to do is add `DEBUG=1` after `make` in any of the above described build targets
+just like `make DEBUG=1 all` for example. But be careful to run `make cleanall` before changing between debug and release
+builds to remove and force rebuild of all files. If you omit the `DEBUG=...` flag after `make` or use `DEBUG=0`, the
+release build will be built (compiler optimizations enabled, assertions disabled), which is geared to run fast for
+production.
 
 ### Development environment
 
