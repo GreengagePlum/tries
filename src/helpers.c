@@ -19,8 +19,26 @@
 
 void insererPT(void)
 {
-    fprintf(stderr, "Fonctionnalité pas encore implanté");
-    exit(1);
+    PatriciaNode *pt = create_patricia_node();
+    ssize_t sz;
+    size_t cap = 0;
+    char *s = NULL;
+    while ((sz = getline(&s, &cap, stdin)) > 0)
+    {
+        if (!feof(stdin))
+            s[sz - 1] = '\0';
+        insert_patricia(pt, s);
+    }
+    if (sz == -1 && ferror(stdin))
+    {
+        fprintf(stderr, "Erreur, getline dans insererPT");
+        exit(1);
+    }
+    free(s);
+    char *json = printJSONPT(pt);
+    printf("%s", json);
+    free(json);
+    free_patricia_node(pt);
 }
 
 void insererTH(void)
@@ -113,9 +131,54 @@ char *readJSON(FILE *f, size_t *sz)
 
 void suppressionPT(const char *path)
 {
-    (void)path;
-    fprintf(stderr, "Fonctionnalité pas encore implanté");
-    exit(1);
+    FILE *f = fopen(path, "r+");
+    if (!f)
+    {
+        perror("Erreur, fopen dans suppressionPT");
+        exit(1);
+    }
+    size_t fsize;
+    char *s = readJSON(f, &fsize);
+    PatriciaNode *pt = parseJSONPT(s, fsize);
+    free(s);
+
+    ssize_t sz;
+    size_t cap = 0;
+    s = NULL;
+    while ((sz = getline(&s, &cap, stdin)) > 0)
+    {
+        if (!feof(stdin))
+            s[sz - 1] = '\0';
+        int i = delete_word(pt, s);
+        if(!(i == 0 || i == 1)){
+            fprintf(stderr, "Erreur, suppressionPT");
+            exit(1);
+        }
+    }
+    if (sz == -1 && ferror(stdin))
+    {
+        fprintf(stderr, "Erreur, getline dans suppressionPT");
+        exit(1);
+    }
+
+    free(s);
+    rewind(f);
+    if (ftruncate(fileno(f), 0) == -1)
+    {
+        perror("Erreur, ftruncate dans suppressionPT");
+        exit(1);
+    }
+    s = printJSONPT(pt);
+    fprintf(f, "%s", s);
+
+    if (fclose(f) == EOF)
+    {
+        perror("Erreur, fclose dans suppressionPT");
+        exit(1);
+    }
+    free(s);
+    free_patricia_node(pt);
+
 }
 
 void suppressionTH(const char *path)
@@ -168,10 +231,43 @@ void suppressionTH(const char *path)
 
 void fusionMainPT(const char *path1, const char *path2)
 {
-    (void)path1;
-    (void)path2;
-    fprintf(stderr, "Fonctionnalité pas encore implanté");
-    exit(1);
+    FILE *f1 = fopen(path1, "r");
+    if (!f1)
+    {
+        perror("Erreur, fopen dans fusionMainPT");
+        exit(1);
+    }
+    FILE *f2 = fopen(path2, "r");
+    if (!f2)
+    {
+        perror("Erreur, fopen dans fusionMainPT");
+        exit(1);
+    }
+    size_t fsize;
+    char *s;
+    s = readJSON(f1, &fsize);
+    PatriciaNode *pt1 =parseJSONPT(s, fsize);
+    free(s);
+    s = readJSON(f2, &fsize);
+    PatriciaNode *pt2 = parseJSONPT(s, fsize);
+    free(s);
+
+    pt1 = pat_fusion(pt1, pt2);
+    s = printJSONPT(pt1);
+    printf("%s", s);
+    free(s);
+
+    if (fclose(f1) == EOF)
+    {
+        perror("Erreur, fclose dans profondeurMoyenneMainTH");
+        exit(1);
+    }
+    if (fclose(f2) == EOF)
+    {
+        perror("Erreur, fclose dans profondeurMoyenneMainTH");
+        exit(1);
+    }
+    free_patricia_node(pt1);
 }
 
 void fusionMainTH(const char *path1, const char *path2)
@@ -219,9 +315,29 @@ void fusionMainTH(const char *path1, const char *path2)
 
 void listeMotsMainPT(const char *path)
 {
-    (void)path;
-    fprintf(stderr, "Fonctionnalité pas encore implanté");
-    exit(1);
+    FILE *f = fopen(path, "r");
+    if(!f){
+        perror("Erreur, fopen dans listeMotsMainPT");
+        exit(1);
+    }
+    size_t fsize;
+    char *s = readJSON(f, &fsize);
+    PatriciaNode *pt = parseJSONPT(s, fsize);
+    free(s);
+    char** liste = liste_mots_patricia(pt);
+    if(liste){
+        for(char** i = liste; *i; i++){
+            printf("%s\n", *i);
+        }
+    }
+
+    if(fclose(f) == EOF){
+        perror("Erreur, fclose dans listeMotsMainPT");
+        exit(1);
+    }
+    int size = comptage_mots_patricia(pt);
+    free_patricia_node(pt);
+    free_list_patricia(liste, size);
 }
 
 void listeMotsMainTH(const char *path)
@@ -258,9 +374,26 @@ void listeMotsMainTH(const char *path)
 
 void profondeurMoyenneMainPT(const char *path)
 {
-    (void)path;
-    fprintf(stderr, "Fonctionnalité pas encore implanté");
-    exit(1);
+    FILE *f = fopen(path, "r");
+    if (!f)
+    {
+        perror("Erreur, fopen dans profondeurMoyenneMainPT");
+        exit(1);
+    }
+
+    size_t fsize;
+    char *s = readJSON(f, &fsize);
+    PatriciaNode *pt = parseJSONPT(s, fsize);
+    free(s);
+
+    printf("%f", profondeur_moyenne_patricia_feuille(pt));
+
+    if (fclose(f) == EOF)
+    {
+        perror("Erreur, fclose dans profondeurMoyenneMainPT");
+        exit(1);
+    }
+    free_patricia_node(pt);
 }
 
 void profondeurMoyenneMainTH(const char *path)
@@ -289,10 +422,25 @@ void profondeurMoyenneMainTH(const char *path)
 
 void prefixeMainPT(const char *path, const char *cle)
 {
-    (void)path;
-    (void)cle;
-    fprintf(stderr, "Fonctionnalité pas encore implanté");
-    exit(1);
+    FILE *f = fopen(path, "r");
+    if (!f)
+    {
+        perror("Erreur, fopen dans prefixeMainPT");
+        exit(1);
+    }
+    size_t fsize;
+    char *s = readJSON(f, &fsize);
+    PatriciaNode *pt = parseJSONPT(s, fsize);
+    free(s);
+
+    printf("%d", nb_prefixe_patricia(pt, cle));
+
+    if(fclose(f) == EOF){
+        perror("Erreur, fclose dans prefixeMainPT");
+        exit(1);
+    }
+
+    free_patricia_node(pt);
 }
 
 void prefixeMainTH(const char *path, const char *cle)
