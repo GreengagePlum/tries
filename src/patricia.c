@@ -470,18 +470,24 @@ PatriciaNode* pat_fusion(PatriciaNode* node1, PatriciaNode* node2){
         }
         else if(node1->prefixes[i] != NULL && node2->prefixes[i] != NULL){
            if(strcmp(node1->prefixes[i], node2->prefixes[i]) == 0){
-                if (node1->children[i] == NULL){
+                if(i == EOE_INDEX){
+                    
+                }
+                else if (node1->children[i] == NULL){
                     if(node2->children[i] != NULL){
                         node1->children[i] = create_patricia_node();
                         node1->children[i]->prefixes[EOE_INDEX] = strdup(" ");
                     }
                 }
                 else if(node2->children[i] == NULL){
+                    if(node1->children[i]->prefixes[EOE_INDEX] == NULL){
                         node1->children[i]->prefixes[EOE_INDEX] = strdup(" ");
+                    }
                 }
 
                 free(node2->prefixes[i]);
                 node1->children[i] = pat_fusion(node1->children[i], node2->children[i]);
+                node2->children[i] = NULL;
                 //free_patricia_node(node2->children[i]);
            }
            else{
@@ -496,10 +502,11 @@ PatriciaNode* pat_fusion(PatriciaNode* node1, PatriciaNode* node2){
                     free(node2->prefixes[i]);
                     node1->children[i] = pat_fusion(node1->children[i], new_node);
                     node2->children[i] = NULL;
+
                 }
                 else if(suf2){
                     PatriciaNode* new_node = pat_cons(node1->children[i], suf2);
-                    if(node2->children[i] == NULL){
+                    if(node2->children[i] == NULL ){
                         node2->children[i] = create_patricia_node();
                         node2->children[i]->prefixes[EOE_INDEX] = strdup(" ");
                     }
@@ -530,7 +537,7 @@ PatriciaNode* pat_fusion(PatriciaNode* node1, PatriciaNode* node2){
            }
         }
         else{
-            //on fait rien
+
            }
     }
     free(node2);
