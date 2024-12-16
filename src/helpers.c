@@ -150,10 +150,9 @@ void suppressionPT(const char *path)
         if (!feof(stdin))
             s[sz - 1] = '\0';
         int i = delete_word(pt, s);
-        if(i == 0){
-            fprintf(stderr, "Erreur, delete_word dans suppressionPT");
+        if(!(i == 0 || i == 1)){
+            fprintf(stderr, "Erreur, suppressionPT");
             exit(1);
-
         }
     }
     if (sz == -1 && ferror(stdin))
@@ -387,7 +386,7 @@ void profondeurMoyenneMainPT(const char *path)
     PatriciaNode *pt = parseJSONPT(s, fsize);
     free(s);
 
-    printf("%d", profondeur_moyenne_patricia_feuille(pt));
+    printf("%f", profondeur_moyenne_patricia_feuille(pt));
 
     if (fclose(f) == EOF)
     {

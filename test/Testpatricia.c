@@ -193,6 +193,23 @@ void test_fusion(void)
     free_patricia_node(result);
 }
 
+
+void test_deleted_word(void){
+    PatriciaNode *node = create_patricia_node();
+    insert_patricia(node, "they");
+    insert_patricia(node, "the");
+    insert_patricia(node, "them");
+    insert_patricia(node, "toto");
+    insert_patricia(node, "there");
+    TEST_ASSERT_EQUAL_STRING("t", node->prefixes[(unsigned char)'t']);
+    TEST_ASSERT_TRUE(5 == comptage_mots_patricia(node));
+    insert_patricia(node, "apple");
+    insert_patricia(node, "application");
+    insert_patricia(node, "appetizer");
+    TEST_ASSERT_TRUE(1 == delete_word(node, "the"));
+    TEST_ASSERT_TRUE(0 == delete_word(node, "the"));
+}
+
 int main(void)
 {
     UNITY_BEGIN();

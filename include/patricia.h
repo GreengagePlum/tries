@@ -57,7 +57,7 @@ int hauteur_patricia(PatriciaNode* node);
 
 char** liste_mots_patricia(PatriciaNode* node);
 
-int profondeur_moyenne_patricia_feuille(PatriciaNode* node);
+float profondeur_moyenne_patricia_feuille(PatriciaNode* node);
 
 PatriciaNode* pat_fusion(PatriciaNode* node1, PatriciaNode* node2);
 
