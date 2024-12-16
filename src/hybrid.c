@@ -616,7 +616,11 @@ TrieHybride *fusionTH_rec(TrieHybride *restrict th1, const TrieHybride *restrict
     th1 = fusionTH_rec(th1, th2->inf, s);
     pushStack(s, th2->label);
     if (th2->value)
-        th1 = ajoutTH(th1, readStack(s), VALFIN);
+    {
+        const char *str = readStack(s);
+        assert(str && "La chaine lu ne peut pas être nul ici");
+        th1 = ajoutTH(th1, str, VALFIN);
+    }
     th1 = fusionTH_rec(th1, th2->eq, s);
     popStack(s);
     th1 = fusionTH_rec(th1, th2->sup, s);

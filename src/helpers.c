@@ -9,7 +9,7 @@
  *
  */
 
-#define _POSIX_C_SOURCE 200809L
+#define _POSIX_C_SOURCE 200809L /* for `getline()` */
 #include "helpers.h"
 #include "hybrid.h"
 #include "patricia.h"
@@ -57,6 +57,7 @@ void insererTH(void)
  * @param [out] sz Un entier contenant la taille en octets du buffer renvoyé à la fin
  * @return Une chaine de caractères contenant la version sérialisé en JSON du Trie Hybride
  *
+ * @pre @a f doit supporter les déplacements de curseur
  * @pre @a sz n'est pas nul
  * @post C'est à l'appellant de désallouer la chaine retourné
  *
@@ -64,7 +65,8 @@ void insererTH(void)
  * le fichier vers le buffer en une fois. Retourne un pointeur vers le buffer qui contient le contenu de tout le
  * fichier. @a sz contient la taille du buffer renvoyé à la fin. Le buffer renvoyé n'est pas forcément nul terminé. Le
  * curseur du fichier est déplacé au début pour lire tout le fichier mais il est remis à sa place d'origine à la sortie
- * de fonction. Il peut donc continuer à être utilisé comme normal après appel à cette fonction.
+ * de fonction. Les erreurs du flux sont donc forcément effacées dûs à ces déplacements. Il peut donc continuer à être
+ * utilisé comme normal après appel à cette fonction.
  *
  */
 char *readJSON(FILE *f, size_t *sz)
@@ -86,11 +88,7 @@ char *readJSON(FILE *f, size_t *sz)
         perror("Erreur, ftell dans readJSON");
         exit(1);
     }
-    if (fseek(f, 0, SEEK_SET) == -1)
-    {
-        perror("Erreur, fseek dans readJSON");
-        exit(1);
-    }
+    rewind(f);
 
     char *s = malloc(fsize * sizeof(*s));
     if (!s)
