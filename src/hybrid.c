@@ -75,7 +75,7 @@ TrieHybride *allocTH(void)
     return newth;
 }
 
-TrieHybride *ajoutTH(TrieHybride *th, const char *restrict cle, int v)
+TrieHybride *ajoutTH(TrieHybride *th, const char *restrict cle, int v, int *restrict count)
 {
     assert(v != 0 && "Valeur donné pour l'insértion doit être non nul");
     size_t lgr = lgueur(cle);
@@ -96,16 +96,17 @@ TrieHybride *ajoutTH(TrieHybride *th, const char *restrict cle, int v)
         else
         {
             newth->value = VALVIDE;
-            newth->eq = ajoutTH(newTH(), reste(cle), v);
+            newth->eq = ajoutTH(newTH(), reste(cle), v, count);
         }
         return newth;
     }
+    (*count)++;
     if (p < th->label)
-        th->inf = ajoutTH(th->inf, cle, v);
+        th->inf = ajoutTH(th->inf, cle, v, count);
     else if (p > th->label)
-        th->sup = ajoutTH(th->sup, cle, v);
+        th->sup = ajoutTH(th->sup, cle, v, count);
     else
-        th->eq = ajoutTH(th->eq, reste(cle), v);
+        th->eq = ajoutTH(th->eq, reste(cle), v, count);
     if (lgr == 1 && th->label == p && !th->value)
     {
         th->value = v;
@@ -200,29 +201,32 @@ TrieHybride *supprTH_essaye_delete_reorg(TrieHybride *th, bool *didDelete)
  * @param [in,out] th Un pointeur vers le Trie Hybride à traiter
  * @param [in] cle Une chaine de caractères constituant une clé
  * @param [in,out] didDelete Un flag mis à vrai si une supression a bien pu s'effectuer
+ * @param [out] count Le compte du nombre de comparaison de caractères effectuées
  * @return Un pointeur vers le Trie Hybride avec potentiellemnt la clé supprimé et reorganisé
  *
  * @pre didDelete a été alloué par l'appelant
+ * @pre @a count n'est pas nul et l'entier pointé est initialisé à 0
  *
  */
-TrieHybride *supprTH_rec(TrieHybride *th, const char *restrict cle, bool *didDelete)
+TrieHybride *supprTH_rec(TrieHybride *th, const char *restrict cle, bool *didDelete, int *restrict count)
 {
     if (!th)
         return th;
+    (*count)++;
     char p = prem(cle);
     if (p == '\0')
         return th;
     if (p < th->label)
     {
-        th->inf = supprTH_rec(th->inf, cle, didDelete);
+        th->inf = supprTH_rec(th->inf, cle, didDelete, count);
     }
     else if (p > th->label)
     {
-        th->sup = supprTH_rec(th->sup, cle, didDelete);
+        th->sup = supprTH_rec(th->sup, cle, didDelete, count);
     }
     else
     {
-        th->eq = supprTH_rec(th->eq, reste(cle), didDelete);
+        th->eq = supprTH_rec(th->eq, reste(cle), didDelete, count);
     }
     if (lgueur(cle) == 1)
     {
@@ -240,10 +244,10 @@ TrieHybride *supprTH_rec(TrieHybride *th, const char *restrict cle, bool *didDel
     return th;
 }
 
-TrieHybride *supprTH(TrieHybride *th, const char *restrict cle)
+TrieHybride *supprTH(TrieHybride *th, const char *restrict cle, int *restrict count)
 {
     bool didDelete = false;
-    return supprTH_rec(th, cle, &didDelete);
+    return supprTH_rec(th, cle, &didDelete, count);
 }
 
 TrieHybride *deleteTH_rec(TrieHybride *th)
@@ -264,7 +268,7 @@ void deleteTH(TrieHybride **th)
     *th = deleteTH_rec(*th);
 }
 
-bool rechercheTH(const TrieHybride *th, const char *restrict cle)
+bool rechercheTH(const TrieHybride *th, const char *restrict cle, int *restrict count)
 {
     if (!th)
         return false;
@@ -273,12 +277,13 @@ bool rechercheTH(const TrieHybride *th, const char *restrict cle)
         return false;
     bool res;
     char p = prem(cle);
+    (*count)++;
     if (p < th->label)
-        res = rechercheTH(th->inf, cle);
+        res = rechercheTH(th->inf, cle, count);
     else if (p > th->label)
-        res = rechercheTH(th->sup, cle);
+        res = rechercheTH(th->sup, cle, count);
     else
-        res = rechercheTH(th->eq, reste(cle));
+        res = rechercheTH(th->eq, reste(cle), count);
     if (lgr == 1)
         return res || (th->label == p && th->value);
     return res;
@@ -460,14 +465,16 @@ double profondeurMoyenneTH(const TrieHybride *th)
     return (double)sum / count;
 }
 
-int prefixeTH_rec(const TrieHybride *th)
+int prefixeTH_rec(const TrieHybride *th, int *restrict node_count)
 {
     if (!th)
         return 0;
-    return !!th->value + prefixeTH_rec(th->inf) + prefixeTH_rec(th->eq) + prefixeTH_rec(th->sup);
+    (*node_count)++;
+    return !!th->value + prefixeTH_rec(th->inf, node_count) + prefixeTH_rec(th->eq, node_count) +
+           prefixeTH_rec(th->sup, node_count);
 }
 
-int prefixeTH(const TrieHybride *th, const char *cle)
+int prefixeTH(const TrieHybride *th, const char *cle, int *restrict node_count, int *restrict cmp_count)
 {
     if (!th)
         return 0;
@@ -479,6 +486,7 @@ int prefixeTH(const TrieHybride *th, const char *cle)
     /* Advance until the subtree that interests us */
     while (subtree)
     {
+        (*cmp_count)++;
         p = prem(r);
         if (p == '\0')
             break;
@@ -493,10 +501,11 @@ int prefixeTH(const TrieHybride *th, const char *cle)
             subtree = subtree->eq;
             r = reste(r);
         }
+        (*node_count)++;
     }
 
     /* Yeah not too proud of this one */
-    return (!(*r) && lastNode && lastNode->value) + prefixeTH_rec(subtree);
+    return (!(*r) && lastNode && lastNode->value) + prefixeTH_rec(subtree, node_count);
 }
 
 cJSON *constructJSONTH(const TrieHybride *th)
@@ -615,11 +624,12 @@ TrieHybride *fusionTH_rec(TrieHybride *restrict th1, const TrieHybride *restrict
         return th1;
     th1 = fusionTH_rec(th1, th2->inf, s);
     pushStack(s, th2->label);
+    int count;
     if (th2->value)
     {
         const char *str = readStack(s);
         assert(str && "La chaine lu ne peut pas être nul ici");
-        th1 = ajoutTH(th1, str, VALFIN);
+        th1 = ajoutTH(th1, str, VALFIN, &count);
     }
     th1 = fusionTH_rec(th1, th2->eq, s);
     popStack(s);

@@ -48,11 +48,16 @@ void insererTH(void)
     ssize_t sz;
     size_t cap = 0;
     char *s = NULL;
+    int cmp_count = 0;
     while ((sz = getline(&s, &cap, stdin)) > 0)
     {
         if (!feof(stdin))
             s[sz - 1] = '\0';
-        th = ajoutTH(th, s, count++);
+        fprintf(stderr, "[INSERER] Hauteur: [%ld]\n", hauteurTH(th));
+        th = ajoutTH(th, s, count++, &cmp_count);
+        fprintf(stderr, "[INSERER] Nombre de comparaisons de caractères: [%d]\n", cmp_count);
+        fprintf(stderr, "[INSERER] Longueur de la clé: [%lu]\n\n", lgueur(s));
+        cmp_count = 0;
     }
     if (sz == -1 && ferror(stdin))
     {
@@ -150,7 +155,8 @@ void suppressionPT(const char *path)
         if (!feof(stdin))
             s[sz - 1] = '\0';
         int i = delete_word(pt, s);
-        if(!(i == 0 || i == 1)){
+        if (!(i == 0 || i == 1))
+        {
             fprintf(stderr, "Erreur, suppressionPT");
             exit(1);
         }
@@ -178,7 +184,6 @@ void suppressionPT(const char *path)
     }
     free(s);
     free_patricia_node(pt);
-
 }
 
 void suppressionTH(const char *path)
@@ -198,11 +203,16 @@ void suppressionTH(const char *path)
     ssize_t sz;
     size_t cap = 0;
     s = NULL;
+    int count = 0;
     while ((sz = getline(&s, &cap, stdin)) > 0)
     {
         if (!feof(stdin))
             s[sz - 1] = '\0';
-        th = supprTH(th, s);
+        fprintf(stderr, "[SUPPRESSION] Hauteur: [%ld]\n", hauteurTH(th));
+        th = supprTH(th, s, &count);
+        fprintf(stderr, "[SUPPRESSION] Nombre de noeuds visités: [%d]\n", count);
+        fprintf(stderr, "[SUPPRESSION] Longueur de la clé: [%lu]\n\n", lgueur(s));
+        count = 0;
     }
     if (sz == -1 && ferror(stdin))
     {
@@ -246,7 +256,7 @@ void fusionMainPT(const char *path1, const char *path2)
     size_t fsize;
     char *s;
     s = readJSON(f1, &fsize);
-    PatriciaNode *pt1 =parseJSONPT(s, fsize);
+    PatriciaNode *pt1 = parseJSONPT(s, fsize);
     free(s);
     s = readJSON(f2, &fsize);
     PatriciaNode *pt2 = parseJSONPT(s, fsize);
@@ -316,7 +326,8 @@ void fusionMainTH(const char *path1, const char *path2)
 void listeMotsMainPT(const char *path)
 {
     FILE *f = fopen(path, "r");
-    if(!f){
+    if (!f)
+    {
         perror("Erreur, fopen dans listeMotsMainPT");
         exit(1);
     }
@@ -324,14 +335,17 @@ void listeMotsMainPT(const char *path)
     char *s = readJSON(f, &fsize);
     PatriciaNode *pt = parseJSONPT(s, fsize);
     free(s);
-    char** liste = liste_mots_patricia(pt);
-    if(liste){
-        for(char** i = liste; *i; i++){
+    char **liste = liste_mots_patricia(pt);
+    if (liste)
+    {
+        for (char **i = liste; *i; i++)
+        {
             printf("%s\n", *i);
         }
     }
 
-    if(fclose(f) == EOF){
+    if (fclose(f) == EOF)
+    {
         perror("Erreur, fclose dans listeMotsMainPT");
         exit(1);
     }
@@ -435,7 +449,8 @@ void prefixeMainPT(const char *path, const char *cle)
 
     printf("%d", nb_prefixe_patricia(pt, cle));
 
-    if(fclose(f) == EOF){
+    if (fclose(f) == EOF)
+    {
         perror("Erreur, fclose dans prefixeMainPT");
         exit(1);
     }
@@ -457,7 +472,12 @@ void prefixeMainTH(const char *path, const char *cle)
     TrieHybride *th = parseJSONTH(s, fsize);
     free(s);
 
-    printf("%d", prefixeTH(th, cle));
+    int node_count = 0, cmp_count = 0;
+    printf("%d", prefixeTH(th, cle, &node_count, &cmp_count));
+    fprintf(stderr, "[PREFIXE] Nombre de comparaisons de caractères: [%d]\n", cmp_count);
+    fprintf(stderr, "[PREFIXE] Nombre de noeuds visités: [%d]\n", node_count);
+    fprintf(stderr, "[PREFIXE] Hauteur: [%ld]\n", hauteurTH(th));
+    fprintf(stderr, "[PREFIXE] Longueur de la clé: [%lu]\n\n", lgueur(cle));
 
     if (fclose(f) == EOF)
     {

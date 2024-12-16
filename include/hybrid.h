@@ -105,28 +105,32 @@ TrieHybride *newTH(void);
  * @param [in] cle Une chaine de caractères constituant une clé
  * @param [in] v Une valeur non nul pour indiquer la fin du mot, peut être le numéro d'insértion, le constant @c VALFIN
  * peut être utilisé
+ * @param [out] count Le compte du nombre de comparaison de caractères effectuées
  * @return Un pointeur vers le Trie Hybride avec la clé ajouté
  *
  * @pre La clé est terminé par un caractère nul
  * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
+ * @pre @a count n'est pas nul et l'entier pointé est initialisé à 0
  *
  */
-TrieHybride *ajoutTH(TrieHybride *th, const char *restrict cle, int v);
+TrieHybride *ajoutTH(TrieHybride *th, const char *restrict cle, int v, int *restrict count);
 
 /**
  * @brief Supprime une clé du Trie Hybride donné
  *
  * @param [in,out] th Un pointeur vers le Trie Hybride à supprimer la clé
  * @param [in] cle Une chaine de caractères constituant une clé
+ * @param [out] count Le compte du nombre de noeuds visités
  * @return Un pointeur vers le Trie Hybride avec la clé supprimé
  *
  * @pre La clé est terminé par un caractère nul
  * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
+ * @pre @a count n'est pas nul et l'entier pointé est initialisé à 0
  *
  * @internal Le constant @c VALVIDE peut être utilisé pour tester si un noeud n'est pas terminal
  *
  */
-TrieHybride *supprTH(TrieHybride *th, const char *restrict cle);
+TrieHybride *supprTH(TrieHybride *th, const char *restrict cle, int *restrict count);
 
 /**
  * @brief Libère l'espace occupé par le Trie Hybride donné
@@ -144,13 +148,15 @@ void deleteTH(TrieHybride **th);
  *
  * @param [in] th Un pointeur vers le Trie Hybride recherché
  * @param [in] cle Une chaine de caractères constituant une clé
+ * @param [out] count Le compte du nombre de comparaison de caractères effectuées
  * @return Un booléen indiquant si la clé a été trouvé dans le trie ou pas
  *
  * @pre La clé est terminé par un caractère nul
  * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
+ * @pre @a count n'est pas nul et l'entier pointé est initialisé à 0
  *
  */
-bool rechercheTH(const TrieHybride *th, const char *restrict cle);
+bool rechercheTH(const TrieHybride *th, const char *restrict cle, int *restrict count);
 
 /**
  * @brief Compte le nombre de mots dans le Trie Hybride donné
@@ -227,13 +233,17 @@ double profondeurMoyenneTH(const TrieHybride *th);
  *
  * @param [in] th Un pointeur vers le Trie Hybride à parcourir
  * @param [in] cle Une chaine de caractères constituant une clé
+ * @param [out] node_count Le compte du nombre de noeuds visités
+ * @param [out] cmp_count Le compte du nombre de comparaison de caractères effectuées
  * @return Un entier indiquant le nombre de mots dont cle est le prefixe dans le trie
  *
  * @pre La clé est terminé par un caractère nul
  * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
+ * @pre @a node_count n'est pas nul et l'entier pointé est initialisé à 0
+ * @pre @a cmp_count n'est pas nul et l'entier pointé est initialisé à 0
  *
  */
-int prefixeTH(const TrieHybride *th, const char *cle);
+int prefixeTH(const TrieHybride *th, const char *cle, int *restrict node_count, int *restrict cmp_count);
 
 /**
  * @brief Sérialise le Trie Hybride donné sous format JSON
