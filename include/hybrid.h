@@ -33,8 +33,8 @@
 
 typedef struct trie_hybride
 {
+    long value;  /**< Indicateur de fin de mot si non nul */
     char label; /**< Un caractère d'une clé stocké dans le trie */
-    int value;  /**< Indicateur de fin de mot si non nul */
     struct trie_hybride *inf, *eq, *sup;
 } TrieHybride;
 
