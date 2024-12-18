@@ -19,6 +19,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [1.0.1] - 2024-12-18
+
+### Added
+
+- Rebalancing insertions for Hybrid Trie
+
+### Changed
+
+- `inserer` script now has an extra optional flag to run balancing insertions on Hybrid Tries (this doesn't break any
+existing API, merely adds on top)
+
+### Fixed
+
+- CI/CD issues were solved relating to problems with Git commands during jobs
+
 ## [1.0.0] - 2024-12-16
 
 ### Added
@@ -32,7 +47,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initialized git repo with base files
 
-[unreleased]: https://github.com/GreengagePlum/tries/compare/v1.0.0...HEAD
+[unreleased]: https://github.com/GreengagePlum/tries/compare/v1.0.1...HEAD
+
+[1.0.1]: https://github.com/GreengagePlum/tries/compare/v1.0.0...v1.0.1
 
 [1.0.0]: https://github.com/GreengagePlum/tries/compare/v0.0.1...v1.0.0
 
