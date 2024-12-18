@@ -29,8 +29,6 @@ const char* suffixe(const char* s1, const char* s2);
 int plus_long_pref(const char *s1, const char *s2);
 int est_prefixe(const char* s1, const char* s2);
 void free_patricia_node(PatriciaNode* node);
-void remove_eoe_char(char* s);
-int has_eoe_char(const char* s);
 int max(int a, int b);
 void print_list_patricia(char** liste, int size);
 void print_patricia(PatriciaNode* node, int depth);

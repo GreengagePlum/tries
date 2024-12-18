@@ -36,6 +36,13 @@ PatriciaNode *create_patricia_node(void){
     return node;
 }
 
+/**
+ * @brief Fonction qui retourne le suffixe d'un mot qui est prefixe d'un autre mot
+ *
+ * @param s1
+ * @param s2
+ * @return const char*
+ */
 const char* suffixe(const char* s1, const char* s2){
     if(s1 == NULL || s2 == NULL){
         return NULL;
@@ -102,6 +109,13 @@ void insert_patricia(PatriciaNode* patricia, const char* word) {
     }
 }
 
+/**
+* @brief Fonction qui retourne la longueur du plus long prefixe commun entre deux mots
+*
+* @param s1
+* @param s2
+* @return int
+ */
 int plus_long_pref(const char *s1, const char *s2) {
     int i = 0;
     while (s1[i] && s2[i] && s1[i] == s2[i]) i++;
@@ -146,7 +160,13 @@ int recherche_patricia(PatriciaNode* node, const char* word) {
 }
 
 
-
+/**
+ * @brief Fonction qui concatène deux chaînes de caractères
+ *
+ * @param s1
+ * @param s2
+ * @return char*
+ */
 char* string_concat(const char* s1, const char* s2) {
     size_t len1 = strlen(s1);
     size_t len2 = strlen(s2);
@@ -160,6 +180,11 @@ char* string_concat(const char* s1, const char* s2) {
     return res;
 }
 
+/**
+ * @brief Fonction qui libère la mémoire allouée pour un noeud Patricia
+ *
+ * @param node
+ */
 void free_patricia_node(PatriciaNode* node) {
     if (node == NULL) {
         return;
@@ -175,6 +200,13 @@ void free_patricia_node(PatriciaNode* node) {
     free(node);
 }
 
+/**
+ * @brief Fonction qui supprime un mot du Patricia-Trie
+ *
+ * @param node
+ * @param word
+ * @return int
+ */
 int delete_word(PatriciaNode* node, const char* word){
     if (node == NULL) {
         return 0;
@@ -243,6 +275,12 @@ int delete_word(PatriciaNode* node, const char* word){
 }
 
 
+/**
+ * @brief Fonction qui compte le nombre de mots dans le Patricia-Trie
+ *
+ * @param node
+ * @return int
+ */
 int comptage_mots_patricia(PatriciaNode* node) {
     int count = 0;
     for (int i = 0; i < ASCII_SIZE; i++) {
@@ -261,9 +299,12 @@ int comptage_mots_patricia(PatriciaNode* node) {
     return count;
 }
 
-int has_eoe_char(const char* s) {
-    return s != NULL && s[strlen(s) - 1] == EOE_CHAR;
-}
+/**
+ * @brief Fonction qui compte le nombre de pointeurs vers null dans le Patricia-Trie
+ *
+ * @param node
+ * @return int
+ */
 int comptage_nil_patricia(PatriciaNode* node) {
     int count = 0;
     for (int i = 0; i < ASCII_SIZE; i++) {
@@ -281,6 +322,12 @@ int max(int a, int b) {
     return (a > b) ? a : b;
 }
 
+/**
+ * @brief Fonction qui retourne la hauteur du Patricia-Trie
+ *
+ * @param node
+ * @return int
+ */
 int hauteur_patricia(PatriciaNode* node) {
     int height = 0;
     for (int i = 0; i < ASCII_SIZE; i++) {
@@ -291,6 +338,13 @@ int hauteur_patricia(PatriciaNode* node) {
     return height + 1;
 }
 
+/**
+ * @brief Fonction qui compte le nombre de mots dans le Patricia-Trie qui sont préfixes d'un mot donné
+ *
+ * @param node
+ * @param word
+ * @return int
+ */
 int nb_prefixe_patricia(PatriciaNode* node, const char* word) {
     if (node == NULL || *word == '\0') {
         return 0;
@@ -321,6 +375,13 @@ int nb_prefixe_patricia(PatriciaNode* node, const char* word) {
     return 0;
 }
 
+/**
+ * @brief Fonction qui retourne vrai si un mot est préfixe d'un autre mot
+ *
+ * @param s1
+ * @param s2
+ * @return int
+ */
 int est_prefixe(const char* s1, const char* s2){
     int i = 0;
     while(s1[i] && s2[i] && s1[i] == s2[i]){
@@ -330,7 +391,12 @@ int est_prefixe(const char* s1, const char* s2){
 }
 
 
-
+/**
+ * @brief Fonction qui retourne la liste des mots dans le Patricia-Trie
+ *
+ * @param node
+ * @return char**
+ */
 char** liste_mots_patricia(PatriciaNode* node) {
     static char* res[MAX_WORDS];
     static int index = 0;
@@ -382,6 +448,12 @@ void free_list_patricia(char** list, int size) {
     }
 }
 
+/**
+ * @brief Fonction qui affiche le Patricia-Trie
+ *
+ * @param node
+ * @param depth
+ */
 void print_patricia(PatriciaNode* node, int depth) {
     if (node == NULL) {
         return;
@@ -400,6 +472,13 @@ void print_patricia(PatriciaNode* node, int depth) {
         }
     }
 }
+
+/**
+ * @brief Fonction qui retourne la profondeur moyenne des feuilles du Patricia-Trie
+ *
+ * @param node
+ * @return float
+ */
 float profondeur_moyenne_patricia_feuille(PatriciaNode* node){
     int sum = 0;
     int nbFeuilles = 0;
@@ -431,6 +510,15 @@ void calcule_profondeur_moyenne_patricia_feuille(PatriciaNode* node, int profond
     }
 }
 
+/**
+ * @brief Fonction helper pour fusionner deux Patricia-Tries
+ *
+ * @param s1
+ * @param s2
+ * @param x
+ * @param y
+ * @param z
+ */
 void prefixe_fusion(const char* s1, const char* s2, char* x, char* y, char* z){
     int prefix_len = plus_long_pref(s1, s2);
     strncpy(x, s1, prefix_len);
@@ -438,7 +526,13 @@ void prefixe_fusion(const char* s1, const char* s2, char* x, char* y, char* z){
     strcpy(y, s1 + prefix_len);
     strcpy(z, s2 + prefix_len);
 }
-
+/**
+ * @brief Fonction creer un nouveau noeud Patricia, word devient le prefixe et node l'enfant
+ *
+ * @param s1
+ * @param s2
+ * @return char*
+ */
 PatriciaNode* pat_cons(PatriciaNode* node, const char* word){
     PatriciaNode* new_node = create_patricia_node();
     insert_patricia(new_node, word);
@@ -451,6 +545,14 @@ PatriciaNode* pat_cons(PatriciaNode* node, const char* word){
     return new_node;
 }
 
+
+/**
+ * @brief Fonction qui fusionne deux Patricia-Tries
+ *
+ * @param node1
+ * @param node2
+ * @return PatriciaNode*
+ */
 PatriciaNode* pat_fusion(PatriciaNode* node1, PatriciaNode* node2){
     if(node1 == NULL){
         return node2;
