@@ -42,15 +42,18 @@ int main(int argc, char *argv[])
     switch (op)
     {
     case INSERER:
-        if (argc != 3)
+        if (argc != 4)
         {
-            fprintf(stderr, "usage: %s %d <TrieType>", argv[0], INSERER);
+            fprintf(stderr, "usage: %s %d <TrieType> <isRebalanced>", argv[0], INSERER);
             exit(1);
         }
         if (tt == PATRICIA)
             insererPT();
         else if (tt == HYBRID)
-            insererTH();
+        {
+            int isRebalanced = atoi(argv[3]);
+            insererTH(isRebalanced);
+        }
         else
         {
             fprintf(stderr, "Erreur, TrieType [%d] inconnu", tt);

@@ -2,8 +2,8 @@
  * @file hybrid.c
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier source contenant les corps des fonctions pour le Trie Hybride
- * @version 0.5
- * @date 2024-11-18
+ * @version 0.6
+ * @date 2024-12-18
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
  *
@@ -648,4 +648,134 @@ TrieHybride *fusionCopieTH(const TrieHybride *restrict th1, const TrieHybride *r
     th = fusionTH(&th, th1);
     th = fusionTH(&th, th2);
     return th;
+}
+
+int indirectionLevel(TrieHybride *th)
+{
+    if (!th)
+        return 0;
+
+    if (determine_enfants(th) == AUCUNENF)
+        return 0;
+
+    return 1 + indirectionLevel(th->inf) + indirectionLevel(th->sup);
+}
+
+/**
+ * @private
+ *
+ * @brief Effectue une rotation droite pour équilibrer
+ *
+ * @pre Le Trie Hybride donné est non vide (non nul)
+ *
+ */
+TrieHybride *rotateRight(TrieHybride *y)
+{
+    assert(y && "Given Hybrid Trie can't be NULL");
+    TrieHybride *x = y->inf;
+    TrieHybride *T = x->sup;
+
+    x->sup = y;
+    y->inf = T;
+
+    return x;
+}
+
+/**
+ * @private
+ *
+ * @brief Effectue une rotation gauche pour équilibrer
+ *
+ * @pre Le Trie Hybride donné est non vide (non nul)
+ *
+ */
+TrieHybride *rotateLeft(TrieHybride *x)
+{
+    assert(x && "Given Hybrid Trie can't be NULL");
+    TrieHybride *y = x->sup;
+    TrieHybride *T = y->inf;
+
+    y->inf = x;
+    x->sup = T;
+
+    return y;
+}
+
+TrieHybride *rebalance(TrieHybride *th)
+{
+    assert(th && "Given Hybrid Trie can't be NULL");
+    int balanceFactor = indirectionLevel(th->inf) - indirectionLevel(th->sup);
+
+    /* Left heavy */
+    if (balanceFactor >= 1)
+    {
+        if (indirectionLevel(th->inf->inf) >= indirectionLevel(th->inf->sup))
+        {
+            /* Single right rotation */
+            return rotateRight(th);
+        }
+        else
+        {
+            /* Left-right rotation */
+            th->inf = rotateLeft(th->inf);
+            return rotateRight(th);
+        }
+    }
+
+    /* Right heavy */
+    if (balanceFactor <= -1)
+    {
+        if (indirectionLevel(th->sup->sup) >= indirectionLevel(th->sup->inf))
+        {
+            /* Single left rotation */
+            return rotateLeft(th);
+        }
+        else
+        {
+            /* Right-left rotation */
+            th->sup = rotateRight(th->sup);
+            return rotateLeft(th);
+        }
+    }
+
+    /* Node is balanced */
+    return th;
+}
+
+TrieHybride *ajoutReequilibreTH(TrieHybride *th, const char *restrict cle, int v)
+{
+    assert(v != 0 && "Valeur donné pour l'insértion doit être non nul");
+    size_t lgr = lgueur(cle);
+    if (lgr == 0)
+        return th;
+    char p = prem(cle);
+    if (!th)
+    {
+        TrieHybride *newth = allocTH();
+        newth->label = p;
+        newth->inf = NULL;
+        newth->sup = NULL;
+        if (lgr == 1)
+        {
+            newth->value = v;
+            newth->eq = NULL;
+        }
+        else
+        {
+            newth->value = VALVIDE;
+            newth->eq = ajoutReequilibreTH(newTH(), reste(cle), v);
+        }
+        return newth;
+    }
+    if (p < th->label)
+        th->inf = ajoutReequilibreTH(th->inf, cle, v);
+    else if (p > th->label)
+        th->sup = ajoutReequilibreTH(th->sup, cle, v);
+    else
+        th->eq = ajoutReequilibreTH(th->eq, reste(cle), v);
+    if (lgr == 1 && th->label == p && !th->value)
+    {
+        th->value = v;
+    }
+    return rebalance(th);
 }
