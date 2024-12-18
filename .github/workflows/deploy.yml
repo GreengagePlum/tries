@@ -50,9 +50,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-tags: true
           fetch-depth: 0
-      - run: echo "Running release_job for ${{ github.ref_name }}"
-      - run: |
+      - name: Release job
+        run: |
+          echo "Running release-job for ${{ github.ref_name }}"
           pushd scripts/
           ./create_latest_release_description.sh > ../CHANGELOG.md
           popd
