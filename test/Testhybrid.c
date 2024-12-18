@@ -2902,6 +2902,32 @@ void test_f_fusionCopieTH_1(void)
     deleteTH(&th1);
     deleteTH(&th2);
 }
+void test_f_ajoutReequilibreTH_1(void)
+{
+    TrieHybride *th1 = newTH();
+    TEST_ASSERT_NULL(th1);
+    th1 = ajoutTH(th1, "bat", VALFIN);
+    th1 = ajoutTH(th1, "car", VALFIN);
+    th1 = ajoutTH(th1, "cat", VALFIN);
+    th1 = ajoutTH(th1, "cart", VALFIN);
+    th1 = ajoutTH(th1, "dog", VALFIN);
+    TEST_ASSERT_NOT_NULL(th1);
+
+    TrieHybride *th2 = newTH();
+    TEST_ASSERT_NULL(th2);
+    th2 = ajoutReequilibreTH(th2, "bat", VALFIN);
+    th2 = ajoutReequilibreTH(th2, "car", VALFIN);
+    th2 = ajoutReequilibreTH(th2, "cat", VALFIN);
+    th2 = ajoutReequilibreTH(th2, "cart", VALFIN);
+    th2 = ajoutReequilibreTH(th2, "dog", VALFIN);
+    TEST_ASSERT_NOT_NULL(th2);
+
+    TEST_ASSERT(profondeurMoyenneTH(th1) > 3.2); /* Profondeur moyenne : 3,5 */
+    TEST_ASSERT(profondeurMoyenneTH(th2) < 3.2); /* Profondeur moyenne : 3,0 */
+
+    deleteTH(&th1);
+    deleteTH(&th2);
+}
 
 int main(void)
 {
@@ -2986,5 +3012,6 @@ int main(void)
     RUN_TEST(test_f_fusionTH_4);
     RUN_TEST(test_f_fusionTH_5);
     RUN_TEST(test_f_fusionCopieTH_1);
+    RUN_TEST(test_f_ajoutReequilibreTH_1);
     return UNITY_END();
 }

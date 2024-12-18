@@ -41,8 +41,13 @@ void insererPT(void)
     free_patricia_node(pt);
 }
 
-void insererTH(void)
+void insererTH(bool isRebalanced)
 {
+    TrieHybride *(*ajout)(TrieHybride *th, const char *restrict cle, int v);
+    if (isRebalanced)
+        ajout = ajoutReequilibreTH;
+    else
+        ajout = ajoutTH;
     TrieHybride *th = newTH();
     long count = 1;
     ssize_t sz;
@@ -52,7 +57,7 @@ void insererTH(void)
     {
         if (!feof(stdin))
             s[sz - 1] = '\0';
-        th = ajoutTH(th, s, count++);
+        th = ajout(th, s, count++);
     }
     if (sz == -1 && ferror(stdin))
     {
@@ -150,7 +155,8 @@ void suppressionPT(const char *path)
         if (!feof(stdin))
             s[sz - 1] = '\0';
         int i = delete_word(pt, s);
-        if(!(i == 0 || i == 1)){
+        if (!(i == 0 || i == 1))
+        {
             fprintf(stderr, "Erreur, suppressionPT");
             exit(1);
         }
@@ -178,7 +184,6 @@ void suppressionPT(const char *path)
     }
     free(s);
     free_patricia_node(pt);
-
 }
 
 void suppressionTH(const char *path)
@@ -246,7 +251,7 @@ void fusionMainPT(const char *path1, const char *path2)
     size_t fsize;
     char *s;
     s = readJSON(f1, &fsize);
-    PatriciaNode *pt1 =parseJSONPT(s, fsize);
+    PatriciaNode *pt1 = parseJSONPT(s, fsize);
     free(s);
     s = readJSON(f2, &fsize);
     PatriciaNode *pt2 = parseJSONPT(s, fsize);
@@ -316,7 +321,8 @@ void fusionMainTH(const char *path1, const char *path2)
 void listeMotsMainPT(const char *path)
 {
     FILE *f = fopen(path, "r");
-    if(!f){
+    if (!f)
+    {
         perror("Erreur, fopen dans listeMotsMainPT");
         exit(1);
     }
@@ -324,14 +330,17 @@ void listeMotsMainPT(const char *path)
     char *s = readJSON(f, &fsize);
     PatriciaNode *pt = parseJSONPT(s, fsize);
     free(s);
-    char** liste = liste_mots_patricia(pt);
-    if(liste){
-        for(char** i = liste; *i; i++){
+    char **liste = liste_mots_patricia(pt);
+    if (liste)
+    {
+        for (char **i = liste; *i; i++)
+        {
             printf("%s\n", *i);
         }
     }
 
-    if(fclose(f) == EOF){
+    if (fclose(f) == EOF)
+    {
         perror("Erreur, fclose dans listeMotsMainPT");
         exit(1);
     }
@@ -435,7 +444,8 @@ void prefixeMainPT(const char *path, const char *cle)
 
     printf("%d", nb_prefixe_patricia(pt, cle));
 
-    if(fclose(f) == EOF){
+    if (fclose(f) == EOF)
+    {
         perror("Erreur, fclose dans prefixeMainPT");
         exit(1);
     }

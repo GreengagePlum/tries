@@ -1,15 +1,27 @@
 #!/usr/bin/env bash
 
 # Check if exactly two arguments are provided
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <x> <y>"
+if [ "$#" -lt 2 -o "$#" -gt 3 ]; then
+    echo "Usage: $0 <x> <y> [z]"
     echo "x: 0 -> Patricia-Trie | 1 -> Hybrid Trie"
     echo "y: A text file with one word per line"
+    echo "z: An optional boolean telling to use or not use rebalanced insertions (0 -> don't use | 1 -> use, only for Hybrid Trie"
     exit 1
 fi
 
 x=$1
 y=$2
+if [ "$#" -eq 3 ]; then
+    z=$3
+    # Check if z is either 0 or 1
+    if ! [ "$z" -eq 0 -o "$z" -eq 1 ]; then
+        echo "Error: z must be 0 or 1"
+        echo "z: An optional boolean telling to use or not use rebalanced insertions (0 -> don't use | 1 -> use, only for Hybrid Trie"
+        exit 1
+    fi
+else
+    z=0
+fi
 
 # Check if x is either 0 or 1
 if [ "$x" -eq 0 ]; then
@@ -23,4 +35,4 @@ else
 fi
 
 # Run the program
-./tries 0 "$x" <"$y" >"$outfile"
+./tries 0 "$x" "$z" <"$y" >"$outfile"

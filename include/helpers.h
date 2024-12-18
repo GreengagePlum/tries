@@ -11,6 +11,8 @@
  *
  */
 
+#include <stdbool.h>
+
 /**
  * @brief Lit une liste de mots depuis l'entrée standard et écrit le Patricia-Trie correspondant sous format JSON en
  * sortie standard
@@ -27,13 +29,15 @@ void insererPT(void);
  * @brief Lit une liste de mots depuis l'entrée standard et écrit le Trie Hybride correspondant sous format JSON en
  * sortie standard
  *
+ * @param [in] isRebalanced Un booléen qui dicte s'il faut utiliser des ajouts avec ou sans rééquilibrage
+ *
  * @pre Les mots sont composés des caractères ASCII (128 possibilités) encodé sur 8 bits
  *
  * La liste de mots donné dans l'entrée standard doit être sous forme d'un mot par ligne. La sortie standard contiendra
  * le Trie Hybride correspondant (construit par ajouts successifs des mots donnés) sous format JSON.
  *
  */
-void insererTH(void);
+void insererTH(bool isRebalanced);
 
 /**
  * @brief Lit le Patricia-Trie depuis le fichier JSON donné en argument, supprime les mots lus depuis l'entrée standard

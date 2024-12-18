@@ -4,8 +4,8 @@
  * @file hybrid.h
  * @author Efe ERKEN (efe.erken@etu.sorbonne-universite.fr)
  * @brief Fichier d'entête contenant les déclaration des fonctions pour le Trie Hybride
- * @version 0.5
- * @date 2024-11-18
+ * @version 0.6
+ * @date 2024-12-18
  *
  * @copyright Copyright (C) 2024 Efe ERKEN
  *
@@ -33,7 +33,7 @@
 
 typedef struct trie_hybride
 {
-    long value;  /**< Indicateur de fin de mot si non nul */
+    long value; /**< Indicateur de fin de mot si non nul */
     char label; /**< Un caractère d'une clé stocké dans le trie */
     struct trie_hybride *inf, *eq, *sup;
 } TrieHybride;
@@ -112,6 +112,21 @@ TrieHybride *newTH(void);
  *
  */
 TrieHybride *ajoutTH(TrieHybride *th, const char *restrict cle, int v);
+
+/**
+ * @brief Ajoute une clé dans le Trie Hybride donné, et effectue un rééquilibrage si nécessaire
+ *
+ * @param [in,out] th Un pointeur vers le Trie Hybride à insérer la clé
+ * @param [in] cle Une chaine de caractères constituant une clé
+ * @param [in] v Une valeur non nul pour indiquer la fin du mot, peut être le numéro d'insértion, le constant @c VALFIN
+ * peut être utilisé
+ * @return Un pointeur vers le Trie Hybride avec la clé ajouté
+ *
+ * @pre La clé est terminé par un caractère nul
+ * @pre La clé est composé des caractères ASCII (128 possibilités) encodé sur 8 bits
+ *
+ */
+TrieHybride *ajoutReequilibreTH(TrieHybride *th, const char *restrict cle, int v);
 
 /**
  * @brief Supprime une clé du Trie Hybride donné
@@ -299,5 +314,23 @@ TrieHybride *fusionTH(TrieHybride **restrict th1, const TrieHybride *restrict th
  *
  */
 TrieHybride *fusionCopieTH(const TrieHybride *restrict th1, const TrieHybride *restrict th2);
+
+/**
+ * @brief Calcule le facteur de rééquilibrage, et si nécessaire l'effectue avec les rotations adaptés
+ *
+ * @param [in,out] th Un pointeur vers le Trie Hybride à rééquilibrer
+ * @return Un pointeur vers le Trie Hybride résultant de la rééquilibrage
+ *
+ * @pre Le Trie Hybride donné est non vide (non nul)
+ *
+ * Si les pointeurs d'indirection (aiguillage : @c inf et @c sup) qui se suivent directement l'un après l'autre sont en
+ * nombre supérieur d'un côté que l'autre, alors le rééquilibrage est effectué pour minimiser le nombre d'indirections
+ * causant la plus grande raison de perte du temps dans une multitude d'opérations. En effet, au lieu d'avancer vers le
+ * but (avancer dans les caractères d'une clé donné), c'est à cause de ces indirections qu'on perd du temps à retrouver
+ * le bon endroit pour déjà commencer à avancer vers notre but. Ce rééquilibrage diminue aussi la profondeur moyenne qui
+ * contribue à l'optimisation du complexité.
+ *
+ */
+TrieHybride *rebalance(TrieHybride *th);
 
 #endif
