@@ -54,7 +54,7 @@ make
 From now on you can run the program via its interface scripts so long as you're in its directory.
 
 ```sh
-./inserer [0 | 1] [file]
+./inserer [0 | 1] [file] [isRebalanced]
 ./suppression [0 | 1] [file]
 ./fusionPat [file] [file]
 ./listeMots [0 | 1] [file]
