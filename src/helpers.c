@@ -54,6 +54,7 @@ void insererTH(void)
         if (!feof(stdin))
             s[sz - 1] = '\0';
         fprintf(stderr, "[INSERER] Hauteur: [%ld]\n", hauteurTH(th));
+        fprintf(stderr, "[INSERER] Profondeur moyenne: [%f]\n", profondeurMoyenneTH(th));
         th = ajoutTH(th, s, count++, &cmp_count);
         fprintf(stderr, "[INSERER] Nombre de comparaisons de caractères: [%d]\n", cmp_count);
         fprintf(stderr, "[INSERER] Longueur de la clé: [%lu]\n\n", lgueur(s));
@@ -209,6 +210,7 @@ void suppressionTH(const char *path)
         if (!feof(stdin))
             s[sz - 1] = '\0';
         fprintf(stderr, "[SUPPRESSION] Hauteur: [%ld]\n", hauteurTH(th));
+        fprintf(stderr, "[SUPPRESSION] Profondeur moyenne: [%f]\n", profondeurMoyenneTH(th));
         th = supprTH(th, s, &count);
         fprintf(stderr, "[SUPPRESSION] Nombre de noeuds visités: [%d]\n", count);
         fprintf(stderr, "[SUPPRESSION] Longueur de la clé: [%lu]\n\n", lgueur(s));
@@ -477,6 +479,7 @@ void prefixeMainTH(const char *path, const char *cle)
     fprintf(stderr, "[PREFIXE] Nombre de comparaisons de caractères: [%d]\n", cmp_count);
     fprintf(stderr, "[PREFIXE] Nombre de noeuds visités: [%d]\n", node_count);
     fprintf(stderr, "[PREFIXE] Hauteur: [%ld]\n", hauteurTH(th));
+    fprintf(stderr, "[PREFIXE] Profondeur moyenne: [%f]\n", profondeurMoyenneTH(th));
     fprintf(stderr, "[PREFIXE] Longueur de la clé: [%lu]\n\n", lgueur(cle));
 
     if (fclose(f) == EOF)
