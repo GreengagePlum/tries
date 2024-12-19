@@ -23,11 +23,12 @@ void insererPT(void)
     ssize_t sz;
     size_t cap = 0;
     char *s = NULL;
+    int cmp_count = 0;
     while ((sz = getline(&s, &cap, stdin)) > 0)
     {
         if (!feof(stdin))
             s[sz - 1] = '\0';
-        insert_patricia(pt, s);
+        insert_patricia_compt(pt, s, &cmp_count);
     }
     if (sz == -1 && ferror(stdin))
     {
@@ -38,6 +39,7 @@ void insererPT(void)
     char *json = printJSONPT(pt);
     printf("%s", json);
     free(json);
+    fprintf(stderr, "Nombre de comparaisons: %d\n", cmp_count);
     free_patricia_node(pt);
 }
 
@@ -147,7 +149,7 @@ void suppressionPT(const char *path)
     char *s = readJSON(f, &fsize);
     PatriciaNode *pt = parseJSONPT(s, fsize);
     free(s);
-
+    int cmp_count = 0;
     ssize_t sz;
     size_t cap = 0;
     s = NULL;
@@ -155,7 +157,7 @@ void suppressionPT(const char *path)
     {
         if (!feof(stdin))
             s[sz - 1] = '\0';
-        int i = delete_word(pt, s);
+        int i = delete_word(pt, s, &cmp_count);
         if (!(i == 0 || i == 1))
         {
             fprintf(stderr, "Erreur, suppressionPT");
@@ -184,6 +186,7 @@ void suppressionPT(const char *path)
         exit(1);
     }
     free(s);
+    fprintf(stderr, "Nombre de comparaisons: %d\n", cmp_count);
     free_patricia_node(pt);
 }
 
@@ -334,10 +337,12 @@ void listeMotsMainPT(const char *path)
         exit(1);
     }
     size_t fsize;
+    int nb_comp = 0;
+    int nb_node = 0;
     char *s = readJSON(f, &fsize);
     PatriciaNode *pt = parseJSONPT(s, fsize);
     free(s);
-    char **liste = liste_mots_patricia(pt);
+    char** liste = liste_mots_patricia(pt, &nb_node, &nb_comp);
     if (liste)
     {
         for (char **i = liste; *i; i++)
@@ -351,7 +356,9 @@ void listeMotsMainPT(const char *path)
         perror("Erreur, fclose dans listeMotsMainPT");
         exit(1);
     }
-    int size = comptage_mots_patricia(pt);
+    int* nb_node2 = 0;
+    int size = comptage_mots_patricia(pt, nb_node2);
+    fprintf(stderr, "Nombre de comparaisons: %d\nNombre de noeuds visités %d\n", nb_comp, nb_node);
     free_patricia_node(pt);
     free_list_patricia(liste, size);
 }
@@ -448,15 +455,17 @@ void prefixeMainPT(const char *path, const char *cle)
     char *s = readJSON(f, &fsize);
     PatriciaNode *pt = parseJSONPT(s, fsize);
     free(s);
-
-    printf("%d", nb_prefixe_patricia(pt, cle));
+    int nb_comp = 0;
+    int nb_node = 0;
+    printf("%d", nb_prefixe_patricia(pt, cle, &nb_node, &nb_comp));
 
     if (fclose(f) == EOF)
     {
         perror("Erreur, fclose dans prefixeMainPT");
         exit(1);
     }
-
+    fprintf(stderr, "Nombre de comparaisons: %d\nNombre de noeuds visités:%d\n", nb_comp, nb_node);
+    fprintf(stderr, "Hauteur de l'arbre: %d\n", hauteur_patricia(pt));
     free_patricia_node(pt);
 }
 

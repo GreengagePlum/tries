@@ -37,25 +37,25 @@ void print_patricia(PatriciaNode* node, int depth);
 void prefixe_fusion(const char* s1, const char* s2, char* x, char* y, char* z);
 PatriciaNode* pat_cons(PatriciaNode* node, const char* word);
 void free_list_patricia(char** list, int size);
-
+void insert_patricia_compt(PatriciaNode* patricia, const char* word, int* nb_comp);
 //FONCTIONS PRINCIPALES
 PatriciaNode *create_patricia_node(void);
 
 void insert_patricia(PatriciaNode *root, const char *mot);
 
-int recherche_patricia(PatriciaNode* patricia, const char* word);
+int recherche_patricia(PatriciaNode* patricia, const char* word, int* nb_comp);
 
-int nb_prefixe_patricia(PatriciaNode* node, const char* word);
+int nb_prefixe_patricia(PatriciaNode* node, const char* word, int* nb_comp, int* nb_node);
 
-int delete_word(PatriciaNode* node, const char* word);
+int delete_word(PatriciaNode* node, const char* word, int* nb_comp);
 
-int comptage_mots_patricia(PatriciaNode* node);
+int comptage_mots_patricia(PatriciaNode* node, int* nb_node);
 
-int comptage_nil_patricia(PatriciaNode* node);
+int comptage_nil_patricia(PatriciaNode* node, int* nb_node);
 
 int hauteur_patricia(PatriciaNode* node);
 
-char** liste_mots_patricia(PatriciaNode* node);
+char** liste_mots_patricia(PatriciaNode* node, int* nb_node, int* nb_word);
 
 float profondeur_moyenne_patricia_feuille(PatriciaNode* node);
 
@@ -64,7 +64,7 @@ PatriciaNode* pat_fusion(PatriciaNode* node1, PatriciaNode* node2);
 //HELPERS RECURSIVES
 void calcule_profondeur_moyenne_patricia_feuille(PatriciaNode* node, int profondeur, int* sum, int* nbFeuilles);
 
-void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char** res, int* index);
+void liste_mots_patricia_recursive(PatriciaNode* node, const char* prefix, char** res, int* index, int* nb_node, int* nb_word);
 
 //CJSON
 
