@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [1.0.2] - 2024-12-19
+
+### Added
+
+- More documentation for Patricia-Trie functions
+
+### Changed
+
+- Cleaned up unnecessary functions for Patricia-Trie
+
 ## [1.0.1] - 2024-12-18
 
 ### Added
@@ -47,7 +57,9 @@ existing API, merely adds on top)
 
 - Initialized git repo with base files
 
-[unreleased]: https://github.com/GreengagePlum/tries/compare/v1.0.1...HEAD
+[unreleased]: https://github.com/GreengagePlum/tries/compare/v1.0.2...HEAD
+
+[1.0.2]: https://github.com/GreengagePlum/tries/compare/v1.0.1...v1.0.2
 
 [1.0.1]: https://github.com/GreengagePlum/tries/compare/v1.0.0...v1.0.1
 
